@@ -4,8 +4,14 @@
 // header file
 
 //Core 
-#include <stdio.h>
 #include "Galactica/Application.h"
+#include "Galactica/Logger/Logger.h"
+
+//-------------------------
+#include <stdio.h>
+
+//-------------------------
+
 
 // Entry Point
 

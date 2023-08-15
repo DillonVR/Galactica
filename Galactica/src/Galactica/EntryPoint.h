@@ -6,7 +6,7 @@ extern Galactica::Application* Galactica::CreateApplication();
 
 int main(int argc, char** argv)
 {
-	printf("Hello from space");
+	Galactica::Logger::Log("ENGINE START UP");
 	auto app = Galactica::CreateApplication();
 	app->Run();
 	delete app;
