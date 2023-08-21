@@ -1,42 +1,34 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    <Filter Include="Galactica">
+      <UniqueIdentifier>{3E73A828-AADD-5C9F-F31B-0E455FC53AF4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    <Filter Include="Galactica\Logger">
+      <UniqueIdentifier>{4DB78681-39B0-A5D3-62E2-8A584E3A85DF}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Galactica\Core.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
+    <ClInclude Include="src\Galactica.h" />
     <ClInclude Include="src\Galactica\Application.h">
-      <Filter>Header Files</Filter>
+      <Filter>Galactica</Filter>
     </ClInclude>
-    <ClInclude Include="src\Galactica.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="src\Galactica\Core.h">
+      <Filter>Galactica</Filter>
     </ClInclude>
     <ClInclude Include="src\Galactica\EntryPoint.h">
-      <Filter>Header Files</Filter>
+      <Filter>Galactica</Filter>
     </ClInclude>
     <ClInclude Include="src\Galactica\Logger\Logger.h">
-      <Filter>Header Files</Filter>
+      <Filter>Galactica\Logger</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Galactica\Application.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Galactica</Filter>
     </ClCompile>
     <ClCompile Include="src\Galactica\Logger\Logger.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Galactica\Logger</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
