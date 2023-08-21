@@ -30,3 +30,9 @@ namespace Galactica {
 		static void Evt(const std::string& message);
 	};
 }
+
+
+//Core Log Macros
+#define GL_LOGGER_INFO(...) ::Galactica::Logger::Log(__VA_ARGS__)
+#define GL_LOGGER_ERR(...) ::Galactica::Logger::Err(__VA_ARGS__)
+#define GL_LOGGER_EVT(...) ::Galactica::Logger::Evt(__VA_ARGS__)
