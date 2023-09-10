@@ -1,12 +1,7 @@
 #pragma once
 
-#include "../Core.h"
+#include "Galactica/Core.h"
 
-#include <iostream>
-#include <string>
-#include <chrono>
-#include <ctime>
-#include <vector>
 
 namespace Galactica {
 

@@ -8,6 +8,13 @@ workspace "Galactica"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
+-- include Dir relative to the root folder
+
+IncludeDir = {}
+IncludeDir["GLFW"] = "Galactica/Vendor/GLFW/include"
+
+include "Galactica/Vendor/GLFW"
+
 project "Galactica"
 	location "Galactica"
 	kind "SharedLib"
@@ -16,12 +23,23 @@ project "Galactica"
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
 
+	pchheader "glpch.h"
+	pchsource "Galactica/src/glpch.cpp"
+
 	files{
 		"%{prj.name}/src/**.h",
 		"%{prj.name}/src/**.cpp"
 	}
 	-- Any Vendors we need to include
-	--include{}
+	includedirs{
+		"%{prj.name}/src",
+		"%{IncludeDir.GLFW}"
+	}
+
+	links{
+		"GLFW",
+		"opengl32.lib"
+	}
 
 	filter { "system:windows"}
 		cppdialect "C++17"
@@ -66,7 +84,8 @@ project "Sandbox"
 
 	-- Any Vendors we need to include
 	includedirs{
-		"Galactica/src"
+		"Galactica/src",
+		"%{IncludeDir.GLFW}"
 	}
 
 	links { "Galactica" }

@@ -1,4 +1,6 @@
+#include "glpch.h"
 #include <Galactica.h>
+
 
 class Sandbox : public Galactica::Application
 {

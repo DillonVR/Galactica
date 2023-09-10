@@ -1,0 +1,3 @@
+[submodule "Galactica/Vendor/GLFW"]
+	path = Galactica/Vendor/GLFW
+	url = https://github.com/glfw/glfw

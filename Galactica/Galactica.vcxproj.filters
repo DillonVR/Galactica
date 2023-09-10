@@ -4,8 +4,17 @@
     <Filter Include="Galactica">
       <UniqueIdentifier>{3E73A828-AADD-5C9F-F31B-0E455FC53AF4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Galactica\Core">
+      <UniqueIdentifier>{564E01A7-421C-F5AC-2BB0-65D3171DD111}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Galactica\Events">
+      <UniqueIdentifier>{624DB071-4E46-CFC3-7778-B44863D0AECF}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Galactica\Logger">
       <UniqueIdentifier>{4DB78681-39B0-A5D3-62E2-8A584E3A85DF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Platform">
+      <UniqueIdentifier>{2AC788B4-1694-E3BF-3FAD-D1672BD9184E}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -16,12 +25,37 @@
     <ClInclude Include="src\Galactica\Core.h">
       <Filter>Galactica</Filter>
     </ClInclude>
+    <ClInclude Include="src\Galactica\Core\KeyCodes.h">
+      <Filter>Galactica\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Galactica\Core\MouseCodes.h">
+      <Filter>Galactica\Core</Filter>
+    </ClInclude>
     <ClInclude Include="src\Galactica\EntryPoint.h">
       <Filter>Galactica</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Galactica\Events\ApplicationEvent.h">
+      <Filter>Galactica\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Galactica\Events\Event.h">
+      <Filter>Galactica\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Galactica\Events\KeyEvent.h">
+      <Filter>Galactica\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Galactica\Events\MouseEvent.h">
+      <Filter>Galactica\Events</Filter>
     </ClInclude>
     <ClInclude Include="src\Galactica\Logger\Logger.h">
       <Filter>Galactica\Logger</Filter>
     </ClInclude>
+    <ClInclude Include="src\Galactica\Window.h">
+      <Filter>Galactica</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Platform\WindowsWindow.h">
+      <Filter>Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="src\glpch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Galactica\Application.cpp">
@@ -30,5 +64,9 @@
     <ClCompile Include="src\Galactica\Logger\Logger.cpp">
       <Filter>Galactica\Logger</Filter>
     </ClCompile>
+    <ClCompile Include="src\Platform\WindowsWindow.cpp">
+      <Filter>Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="src\glpch.cpp" />
   </ItemGroup>
 </Project>
