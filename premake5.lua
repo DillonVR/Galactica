@@ -12,8 +12,10 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 IncludeDir = {}
 IncludeDir["GLFW"] = "Galactica/Vendor/GLFW/include"
+IncludeDir["Glad"] = "Galactica/Vendor/Glad/include"
 
 include "Galactica/Vendor/GLFW"
+include "Galactica/Vendor/Glad"
 
 project "Galactica"
 	location "Galactica"
@@ -30,14 +32,17 @@ project "Galactica"
 		"%{prj.name}/src/**.h",
 		"%{prj.name}/src/**.cpp"
 	}
+
 	-- Any Vendors we need to include
 	includedirs{
 		"%{prj.name}/src",
-		"%{IncludeDir.GLFW}"
+		"%{IncludeDir.GLFW}",
+		"%{IncludeDir.Glad}"
 	}
 
 	links{
 		"GLFW",
+		"Glad",
 		"opengl32.lib"
 	}
 
@@ -58,14 +63,17 @@ project "Galactica"
 
 	filter "configurations:Debug"
 		defines "GL_DEBUG"
+		buildoptions "/MDd"
 		symbols "On"
 
 	filter "configurations:Release"
 		defines "GL_RELEASE"
+		buildoptions "/MD"
 		symbols "On"
 
 	filter "configurations:Dist"
 		defines "GL_DIST"
+		buildoptions "/MD"
 		symbols "On"
 
 project "Sandbox"
@@ -85,7 +93,8 @@ project "Sandbox"
 	-- Any Vendors we need to include
 	includedirs{
 		"Galactica/src",
-		"%{IncludeDir.GLFW}"
+		"%{IncludeDir.GLFW}",
+		"%{IncludeDir.Glad}"
 	}
 
 	links { "Galactica" }
@@ -103,12 +112,15 @@ project "Sandbox"
 
 	filter "configurations:Debug"
 		defines "GL_DEBUG"
+		buildoptions "/MDd"
 		symbols "On"
 
 	filter "configurations:Release"
 		defines "GL_RELEASE"
+		buildoptions "/MD"
 		symbols "On"
 
 	filter "configurations:Dist"
 		defines "GL_DIST"
+		buildoptions "/MD"
 		symbols "On"

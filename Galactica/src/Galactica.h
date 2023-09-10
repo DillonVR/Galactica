@@ -6,6 +6,7 @@
 //Core 
 #include "Galactica/Application.h"
 #include "Galactica/Logger/Logger.h"
+#include "Galactica/Layer.h"
 
 //-------------------------
 #include <stdio.h>

@@ -46,6 +46,12 @@
     <ClInclude Include="src\Galactica\Events\MouseEvent.h">
       <Filter>Galactica\Events</Filter>
     </ClInclude>
+    <ClInclude Include="src\Galactica\Layer.h">
+      <Filter>Galactica</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Galactica\LayerStack.h">
+      <Filter>Galactica</Filter>
+    </ClInclude>
     <ClInclude Include="src\Galactica\Logger\Logger.h">
       <Filter>Galactica\Logger</Filter>
     </ClInclude>
@@ -59,6 +65,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Galactica\Application.cpp">
+      <Filter>Galactica</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Galactica\Layer.cpp">
+      <Filter>Galactica</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Galactica\LayerStack.cpp">
       <Filter>Galactica</Filter>
     </ClCompile>
     <ClCompile Include="src\Galactica\Logger\Logger.cpp">
