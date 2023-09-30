@@ -40,6 +40,8 @@ namespace Galactica {
 		virtual void SetVSync(bool enable) = 0;
 		virtual bool IsVSync() const = 0;
 
+		virtual void* GetNativeWindow() const = 0;
+
 		//crteate a window per platform
 		static Window* Create(const WindowProps& prop = WindowProps());
 

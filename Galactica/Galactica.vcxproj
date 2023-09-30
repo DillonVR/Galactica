@@ -80,7 +80,7 @@
       <PrecompiledHeaderFile>glpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>GL_PLATFORM_WINDOWS;GL_BUILD_DLL;_CRT_SECURE_NO_WARNINGS;GL_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;Vendor\GLFW\include;Vendor\Glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;Vendor\GLFW\include;Vendor\Glad\include;Vendor\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -104,7 +104,7 @@
       <PrecompiledHeaderFile>glpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>GL_PLATFORM_WINDOWS;GL_BUILD_DLL;_CRT_SECURE_NO_WARNINGS;GL_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;Vendor\GLFW\include;Vendor\Glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;Vendor\GLFW\include;Vendor\Glad\include;Vendor\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -128,7 +128,7 @@
       <PrecompiledHeaderFile>glpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>GL_PLATFORM_WINDOWS;GL_BUILD_DLL;_CRT_SECURE_NO_WARNINGS;GL_DIST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;Vendor\GLFW\include;Vendor\Glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;Vendor\GLFW\include;Vendor\Glad\include;Vendor\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -150,6 +150,7 @@
     <ClInclude Include="src\Galactica.h" />
     <ClInclude Include="src\Galactica\Application.h" />
     <ClInclude Include="src\Galactica\Core.h" />
+    <ClInclude Include="src\Galactica\Core\Input.h" />
     <ClInclude Include="src\Galactica\Core\KeyCodes.h" />
     <ClInclude Include="src\Galactica\Core\MouseCodes.h" />
     <ClInclude Include="src\Galactica\EntryPoint.h" />
@@ -157,6 +158,7 @@
     <ClInclude Include="src\Galactica\Events\Event.h" />
     <ClInclude Include="src\Galactica\Events\KeyEvent.h" />
     <ClInclude Include="src\Galactica\Events\MouseEvent.h" />
+    <ClInclude Include="src\Galactica\ImGui\ImGuiLayer.h" />
     <ClInclude Include="src\Galactica\Layer.h" />
     <ClInclude Include="src\Galactica\LayerStack.h" />
     <ClInclude Include="src\Galactica\Logger\Logger.h" />
@@ -166,9 +168,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Galactica\Application.cpp" />
+    <ClCompile Include="src\Galactica\ImGui\ImGuiLayer.cpp" />
     <ClCompile Include="src\Galactica\Layer.cpp" />
     <ClCompile Include="src\Galactica\LayerStack.cpp" />
     <ClCompile Include="src\Galactica\Logger\Logger.cpp" />
+    <ClCompile Include="src\Platform\WindowInput.cpp" />
     <ClCompile Include="src\Platform\WindowsWindow.cpp" />
     <ClCompile Include="src\glpch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
@@ -180,6 +184,9 @@
     </ProjectReference>
     <ProjectReference Include="Vendor\Glad\Glad.vcxproj">
       <Project>{BDD6857C-A90D-870D-52FA-6C103E10030F}</Project>
+    </ProjectReference>
+    <ProjectReference Include="Vendor\imgui\ImGui.vcxproj">
+      <Project>{C0FF640D-2C14-8DBE-F595-301E616989EF}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

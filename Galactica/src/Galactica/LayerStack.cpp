@@ -11,13 +11,17 @@ namespace Galactica
 	{
 		for(Layer* layer : m_layers)
 		{
+			layer->OnDetach();
 			delete layer;
 		}
 	}
 
 	void LayerStack::PushLayer(Layer* layer)
 	{
-		m_LayerInsert = m_layers.emplace(m_LayerInsert, layer);
+		//m_LayerInsert = m_layers.emplace(m_LayerInsert, layer);
+
+		m_layers.emplace(m_layers.begin() + m_LayerInsertIndex, layer);
+		m_LayerInsertIndex++;
 	}
 
 	void LayerStack::PushOverLayer(Layer* overlayer)
@@ -27,11 +31,12 @@ namespace Galactica
 
 	void LayerStack::PopLayer(Layer* layer)
 	{
-		auto it = std::find(m_layers.begin(), m_layers.end(), layer);
+		auto it = std::find(m_layers.begin(), m_layers.begin() + m_LayerInsertIndex, layer);
 		if (it != m_layers.end())
 		{
+			layer->OnDetach();
 			m_layers.erase(it);
-			m_LayerInsert--;
+			m_LayerInsertIndex--;
 		}
 	}
 
@@ -40,6 +45,7 @@ namespace Galactica
 		auto it = std::find(m_layers.begin(), m_layers.end(), overlayer);
 		if (it != m_layers.end())
 		{
+			overlayer->OnDetach();
 			m_layers.erase(it);
 		}
 	}

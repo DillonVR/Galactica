@@ -7,6 +7,7 @@
 #include "Galactica/Application.h"
 #include "Galactica/Logger/Logger.h"
 #include "Galactica/Layer.h"
+#include  "Galactica/ImGui/ImGuiLayer.h"
 
 //-------------------------
 #include <stdio.h>
