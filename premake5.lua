@@ -13,9 +13,12 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 IncludeDir = {}
 IncludeDir["GLFW"] = "Galactica/Vendor/GLFW/include"
 IncludeDir["Glad"] = "Galactica/Vendor/Glad/include"
+IncludeDir["ImGui"] = "Galactica/Vendor/imgui"
 
 include "Galactica/Vendor/GLFW"
 include "Galactica/Vendor/Glad"
+include "Galactica/Vendor/imgui"
+
 
 project "Galactica"
 	location "Galactica"
@@ -37,13 +40,15 @@ project "Galactica"
 	includedirs{
 		"%{prj.name}/src",
 		"%{IncludeDir.GLFW}",
-		"%{IncludeDir.Glad}"
+		"%{IncludeDir.Glad}",
+		"%{IncludeDir.ImGui}"
 	}
 
 	links{
 		"GLFW",
 		"Glad",
-		"opengl32.lib"
+		"opengl32.lib",
+		"ImGui"
 	}
 
 	filter { "system:windows"}
@@ -94,7 +99,8 @@ project "Sandbox"
 	includedirs{
 		"Galactica/src",
 		"%{IncludeDir.GLFW}",
-		"%{IncludeDir.Glad}"
+		"%{IncludeDir.Glad}",
+		"%{IncludeDir.ImGui}"
 	}
 
 	links { "Galactica" }

@@ -1,11 +1,12 @@
 #include "glpch.h"
 #include <Galactica.h>
 
+
 class ExampleLayer : public Galactica::Layer
 {
 public:
 
-	ExampleLayer() : Layer("Expamle")
+	ExampleLayer() : Layer("Example")
 	{
 	}
 
@@ -16,7 +17,7 @@ public:
 
 	void OnEvent(Galactica::Event& event) override
 	{
-		//GL_LOGGER_INFO(event);
+		GL_LOGGER_INFO(event.ToString());
 	}
 
 private:
@@ -31,6 +32,7 @@ class Sandbox : public Galactica::Application
 		Sandbox()
 		{
 			PushLayer(new ExampleLayer());
+			PushOverLayer(new Galactica::ImGuiLayer());
 		}
 		~Sandbox() 
 		{

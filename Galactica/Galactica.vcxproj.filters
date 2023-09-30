@@ -10,6 +10,9 @@
     <Filter Include="Galactica\Events">
       <UniqueIdentifier>{624DB071-4E46-CFC3-7778-B44863D0AECF}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Galactica\ImGui">
+      <UniqueIdentifier>{E8DE9587-546A-034C-5D7B-8640C9855F4C}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Galactica\Logger">
       <UniqueIdentifier>{4DB78681-39B0-A5D3-62E2-8A584E3A85DF}</UniqueIdentifier>
     </Filter>
@@ -24,6 +27,9 @@
     </ClInclude>
     <ClInclude Include="src\Galactica\Core.h">
       <Filter>Galactica</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Galactica\Core\Input.h">
+      <Filter>Galactica\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Galactica\Core\KeyCodes.h">
       <Filter>Galactica\Core</Filter>
@@ -46,6 +52,9 @@
     <ClInclude Include="src\Galactica\Events\MouseEvent.h">
       <Filter>Galactica\Events</Filter>
     </ClInclude>
+    <ClInclude Include="src\Galactica\ImGui\ImGuiLayer.h">
+      <Filter>Galactica\ImGui</Filter>
+    </ClInclude>
     <ClInclude Include="src\Galactica\Layer.h">
       <Filter>Galactica</Filter>
     </ClInclude>
@@ -67,6 +76,9 @@
     <ClCompile Include="src\Galactica\Application.cpp">
       <Filter>Galactica</Filter>
     </ClCompile>
+    <ClCompile Include="src\Galactica\ImGui\ImGuiLayer.cpp">
+      <Filter>Galactica\ImGui</Filter>
+    </ClCompile>
     <ClCompile Include="src\Galactica\Layer.cpp">
       <Filter>Galactica</Filter>
     </ClCompile>
@@ -75,6 +87,9 @@
     </ClCompile>
     <ClCompile Include="src\Galactica\Logger\Logger.cpp">
       <Filter>Galactica\Logger</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\WindowInput.cpp">
+      <Filter>Platform</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\WindowsWindow.cpp">
       <Filter>Platform</Filter>
