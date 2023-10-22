@@ -7,6 +7,7 @@
 #include "Galactica/LayerStack.h"
 
 #include "Window.h"
+#include "ImGui/ImGuiLayer.h"
 
 namespace Galactica {
 
@@ -35,8 +36,14 @@ namespace Galactica {
 
 		inline static Application* s_Instance = nullptr;
 
+		float m_LastFrameTime = 0.0f;
+
 		bool m_Running = true;
+
 		std::unique_ptr<Window> m_Window;
+
+		ImGuiLayer* m_imGUILayer;
+
 		LayerStack m_LayerStack;
 	};
 

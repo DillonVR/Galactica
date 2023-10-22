@@ -3,7 +3,7 @@
 #include "Galactica//Core/KeyCodes.h"
 #include "Galactica/Core/MouseCodes.h"
 
-//#include <glm/glm.hpp>
+#include "Galactica/Vendor/glm/glm/glm.hpp"
 
 namespace Galactica {
 
@@ -18,10 +18,10 @@ namespace Galactica {
 
 		static bool IsMouseButtonPressed(MouseCode button);
 
-		/*static glm::vec2 GetMousePosition();
+		static glm::vec2 GetMousePosition();
 
 		static float GetMouseX();
 
-		static float GetMouseY();*/
+		static float GetMouseY();
 	};
 }

@@ -14,11 +14,12 @@ IncludeDir = {}
 IncludeDir["GLFW"] = "Galactica/Vendor/GLFW/include"
 IncludeDir["Glad"] = "Galactica/Vendor/Glad/include"
 IncludeDir["ImGui"] = "Galactica/Vendor/imgui"
+IncludeDir["Assimp"] = "Galactica/Vendor/assimp/include"
 
 include "Galactica/Vendor/GLFW"
 include "Galactica/Vendor/Glad"
 include "Galactica/Vendor/imgui"
-
+include "Galactica/Vendor/assimp"
 
 project "Galactica"
 	location "Galactica"
@@ -33,7 +34,11 @@ project "Galactica"
 
 	files{
 		"%{prj.name}/src/**.h",
-		"%{prj.name}/src/**.cpp"
+		"%{prj.name}/src/**.cpp",
+		"%{prj.name}/Vendor/stb_image/**.h",
+		"%{prj.name}/Vendor/stb_image/**.cpp",
+		"%{prj.name}/Vendor/glm/glm/**.hpp",
+		"%{prj.name}/Vendor/glm/glm/**.inl"
 	}
 
 	-- Any Vendors we need to include
@@ -41,13 +46,16 @@ project "Galactica"
 		"%{prj.name}/src",
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.Glad}",
-		"%{IncludeDir.ImGui}"
+		"%{IncludeDir.ImGui}",
+		"%{IncludeDir.glm}",
+		"%{IncludeDir.Assimp}"
 	}
 
 	links{
 		"GLFW",
 		"Glad",
 		"opengl32.lib",
+		"Assimp",
 		"ImGui"
 	}
 
@@ -100,7 +108,10 @@ project "Sandbox"
 		"Galactica/src",
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.Glad}",
-		"%{IncludeDir.ImGui}"
+		"%{IncludeDir.ImGui}",
+		"%{IncludeDir.glm}",
+		"%{IncludeDir.Assimp}"
+
 	}
 
 	links { "Galactica" }

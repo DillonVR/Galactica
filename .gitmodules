@@ -4,3 +4,9 @@
 [submodule "Galactica/Vendor/imgui"]
 	path = Galactica/Vendor/imgui
 	url = https://github.com/DillonVR/imgui
+[submodule "Galacctica/Vendor/glm"]
+	path = Galacctica/Vendor/glm
+	url = https://github.com/g-truc/glm.git
+[submodule "Galactica/Vendor/glm"]
+	path = Galactica/Vendor/glm
+	url = https://github.com/g-truc/glm.git
