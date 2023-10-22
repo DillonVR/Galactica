@@ -1,54 +1,38 @@
 #include "glpch.h"
 
 #include "ImGuiLayer.h"
-#include "imgui.h"
 
+#include "imgui.h"
+#include "imgui_internal.h"
+
+#include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_opengl3.h"
+
 #include "Galactica/Application.h"
 #include "GLFW/glfw3.h"
 
 namespace Galactica
 {
 	ImGuiLayer::ImGuiLayer()
-		:	Layer("ImGuiLayer"),
-			show_demo_window(false)
+		: Layer("ImGuiLayer"),
+		show_demo_window(false)
 	{
 	}
 
 	ImGuiLayer::~ImGuiLayer()
 	{
-		ImGui_ImplOpenGL3_Shutdown();
-		ImGui::DestroyContext();
-	}
-
-	void ImGuiLayer::OnUpdate()
-	{
-		ImGuiIO& io = ImGui::GetIO();
-
-		Application& app =  Application::Get();
-		io.DisplaySize = ImVec2(app.GetWindow().GetWidth(),app.GetWindow().GetHeight());
-
-		float time = (float)glfwGetTime();
-		io.DeltaTime = m_time > 0.0f ? (time - m_time) : (1.0f / 60.0f);
-		m_time = time;
-
-		ImGui_ImplOpenGL3_NewFrame();
-		ImGui::NewFrame();
-
-		if (show_demo_window)
-			ImGui::ShowDemoWindow(&show_demo_window);
-
-		ImGui::Begin("Hello, world!");
-		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-		ImGui::End();
-
-		ImGui::Render();
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	}
 
 	void ImGuiLayer::OnEvent(Event& event)
 	{
-		Layer::OnEvent(event);
+		ImGuiIO& io = ImGui::GetIO();
+		event.Handled |= event.IsInCategory(EventCategoryMouse) & io.WantCaptureMouse;
+		event.Handled |= event.IsInCategory(EventCategoryKeyboard) & io.WantCaptureKeyboard;
+	}
+
+	void ImGuiLayer::OnImGuiRender()
+	{
+		//ImGui::ShowDemoWindow(&show_demo_window);
 	}
 
 	void ImGuiLayer::OnAttach()
@@ -72,11 +56,46 @@ namespace Galactica
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
+		Application& app = Application::Get();
+		GLFWwindow* window = static_cast<GLFWwindow*>(app.GetWindow().GetNativeWindow());
+
+		// Setup Platform/Renderer bindings
+		ImGui_ImplGlfw_InitForOpenGL(window, true);
 		ImGui_ImplOpenGL3_Init(glsl_version);
 	}
 
 	void ImGuiLayer::OnDetach()
 	{
-		Layer::OnDetach();
+		ImGui_ImplOpenGL3_Shutdown();
+		ImGui_ImplGlfw_Shutdown();
+		ImGui::DestroyContext();
 	}
+
+	void ImGuiLayer::Begin()
+	{
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
+
+	}
+
+	void ImGuiLayer::End()
+	{
+
+		ImGuiIO& io = ImGui::GetIO();
+		Application& app = Application::Get();
+		io.DisplaySize = ImVec2((float)app.GetWindow().GetWidth(), (float)app.GetWindow().GetHeight());
+
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+		// if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+		// {
+		// 	GLFWwindow* backup_current_context = glfwGetCurrentContext();
+		// 	ImGui::UpdatePlatformWindows();
+		// 	ImGui::RenderPlatformWindowsDefault();
+		// 	glfwMakeContextCurrent(backup_current_context);
+		// }
+	}
+
 }

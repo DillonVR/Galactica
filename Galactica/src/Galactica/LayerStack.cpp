@@ -4,7 +4,6 @@ namespace Galactica
 {
 	LayerStack::LayerStack()
 	{
-		m_LayerInsert = m_layers.begin();
 	}
 
 	LayerStack::~LayerStack()

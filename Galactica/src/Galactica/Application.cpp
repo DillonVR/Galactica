@@ -1,8 +1,17 @@
 #include "glpch.h"
 #include "Application.h"
-#include "Core/Input.h"
+
+#include <fstream>
 
 #include <GLFW/glfw3.h>
+
+#include "Galactica/Vendor/glm/glm/glm.hpp"
+
+#include "Galactica/Vendor/stb_image/stb_image.h"
+#include "Renderer/CameraControl.h"
+#include "Renderer/Model.h"
+
+#include "Renderer/Shader.h"
 
 namespace Galactica {
 
@@ -17,6 +26,9 @@ namespace Galactica {
 
 		m_Window = std::unique_ptr<Window>(Window::Create());
 		m_Window->SetEventCallback(BIND_EVENT_FN(Application::OnEvent));
+
+		m_imGUILayer = new ImGuiLayer();
+		PushOverLayer(m_imGUILayer);
 	}
 
 	Application::~Application()
@@ -25,20 +37,35 @@ namespace Galactica {
 
 	void Application::Run()
 	{
+		stbi_set_flip_vertically_on_load(true);
+		glEnable(GL_DEPTH_TEST);
+
 		
+
 		while (m_Running)
 		{
-			glClearColor(1, 0, 0, 1);
-			glClear(GL_COLOR_BUFFER_BIT);
-			
+			glClearColor(1.0, 1.0, 1.0, 1);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			float time = Timestep::GetTime();
+			Timestep timestep = time - m_LastFrameTime;
+			m_LastFrameTime = time;
+
 			for (Layer* layer : m_LayerStack)
 			{
-				layer->OnUpdate();
+				layer->OnUpdate(timestep);
 			}
 
+			m_imGUILayer->Begin();
+			for (Layer* layer : m_LayerStack)
+			{
+				layer->OnImGuiRender();
+			}
+			m_imGUILayer->End();
+
 			m_Window->OnUpdate();
+
 		}
-	
 	}
 
 	void Application::OnEvent(Event& e)

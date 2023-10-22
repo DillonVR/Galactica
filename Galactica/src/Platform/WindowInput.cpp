@@ -35,7 +35,7 @@ namespace Galactica {
 	}
 
 	
-	/*glm::vec2 Input::GetMousePosition()
+	glm::vec2 Input::GetMousePosition()
 	{
 		auto* window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
 		double xpos, ypos;
@@ -52,6 +52,6 @@ namespace Galactica {
 	float Input::GetMouseY()
 	{
 		return GetMousePosition().y;
-	}*/
+	}
 
 }
