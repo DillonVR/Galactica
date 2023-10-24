@@ -17,9 +17,11 @@ public:
 	std::vector<Galactica::Vertex> vertices;
 	std::vector<unsigned int> indices;
 	std::vector<Galactica::Texture> textures;
+	std::vector<Galactica::BoneLine> skelly;
 
 	bool showBones = false;
 	bool showSkin = true;
+	bool debugMode = false;
 	bool animate = false;
 
 	bool flag = false;
@@ -53,5 +55,7 @@ private:
 	Galactica::Animator animator;
 
 	Galactica::Mesh floormesh;
+
+	Galactica::Mesh bones;
 };
 

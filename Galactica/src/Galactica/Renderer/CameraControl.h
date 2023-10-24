@@ -71,7 +71,10 @@ namespace Galactica
 
 		float ZoomSpeed() const;
 	
-		float cameraFOV = 45.0f, cameraAspectRatio = 1.778f, cameraNearClip = 0.1f, cameraFarClip = 1000.0f;
+		float cameraFOV = 45.0f;
+		float cameraAspectRatio = 1.778f;
+		float cameraNearClip = 0.1f;
+		float cameraFarClip = 1000.0f;
 
 		glm::mat4 cameraViewMatrix;
 
@@ -82,10 +85,10 @@ namespace Galactica
 		glm::vec2 cameraInitialMousePosition = { 0.0f, 0.0f };
 
 		float cameraDistance = 7.0f;
-
-		float cameraPitch = 0.3f, cameraYaw = 0.0f;
-
-		float cameraViewportWidth = 1280, cameraViewportHeight = 720;
+		float cameraPitch = 0.3f;
+		float cameraYaw = 0.0f;
+		float cameraViewportWidth = 1280;
+		float cameraViewportHeight = 720;
 	};
 
 }

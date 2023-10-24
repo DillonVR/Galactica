@@ -20,6 +20,12 @@ namespace Galactica
 		glm::mat4 offset;
 	};
 
+	struct BoneLine
+	{
+		glm::vec3 start;
+		glm::vec3 end;
+	};
+
 	class GALACTICA_API Model
 	{
 	public:
@@ -28,6 +34,7 @@ namespace Galactica
 		std::vector<Mesh> meshes;
 		std::string directory;
 		std::map<std::string, BoneInfo> boneMap;
+		std::vector<BoneLine> boneLines;
 
 		int boneNum = 0;
 
@@ -43,6 +50,10 @@ namespace Galactica
 
 		int& GetBoneCount() { return boneNum; }
 
+		void Bonelines(aiNode* node, BoneLine bone_lines);
+
+		std::vector<BoneLine> GetBoneLines();
+
 	private:
 
 		void SetVertexBoneData(Vertex& vertex, int boneID, float weight);
@@ -56,6 +67,7 @@ namespace Galactica
 		Mesh processMesh(aiMesh* mesh, const aiScene* scene);
 
 		std::vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName);
+
 	};
 
 	unsigned int TextureFromFile(const char* path, const std::string& directory, bool gamma);

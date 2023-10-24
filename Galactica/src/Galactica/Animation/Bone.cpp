@@ -19,7 +19,9 @@ namespace Galactica
 		{
 			aiVector3D aiPosition = channel->mPositionKeys[positionIndex].mValue;
 			float timeStamp = channel->mPositionKeys[positionIndex].mTime;
+
 			KeyPosition data;
+
 			data.position = AssimpToGLMH::GetGLMVec(aiPosition);
 			data.timeStamp = timeStamp;
 			positions.push_back(data);

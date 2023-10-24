@@ -71,6 +71,7 @@ namespace Galactica {
 				data.Width = width;
 				data.Height = height;
 				data.EventCallback(event);
+				glViewport(0, 0, width, height);
 
 			});
 

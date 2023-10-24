@@ -21,24 +21,26 @@ namespace Galactica
 			meshes[i].DrawMesh(shader);
 	}
 
+    // read file via ASSIMP
     void Model::LoadModel(std::string const& path, bool gamma)
 	{
-		// read file via ASSIMP
 		Assimp::Importer importer;
+        //BoneLine skelly{};
 		const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
-		// check for errors
-		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) // if is Not Zero
+		
+		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) 
 		{
 			std::cout << "ERROR::ASSIMP:: " << importer.GetErrorString() << std::endl;
 			return;
 		}
-		// retrieve the directory path of the filepath
+		
 		directory = path.substr(0, path.find_last_of('/'));
 
-		// process ASSIMP's root node recursively
 		processNode(scene->mRootNode, scene);
+        //Bonelines(scene->mRootNode, skelly);
 	}
 
+    //Setter for the vertex bone data
     void Model::SetVertexBoneData(Vertex& vertex, int boneID, float weight)
     {
         for (int i = 0; i < MAX_BONE_INFLUENCE; ++i)
@@ -52,6 +54,7 @@ namespace Galactica
         }
     }
 
+    //Extract Bone Weight For Vertices
     void Model::ExtractBoneWeightForVertices(std::vector<Vertex>& vertices, aiMesh* mesh, const aiScene* scene)
     {
         auto& boneInfoMap = boneMap;
@@ -88,7 +91,7 @@ namespace Galactica
             }
         }
     }
-
+    //Defalaut Bone data
     void Model::SetVertextBoneDataDefault(Vertex& vertex)
     {
         for (int i = 0; i < MAX_BONE_INFLUENCE; i++)
@@ -98,29 +101,30 @@ namespace Galactica
         }
     }
 
+    // process each mesh located at the current node
+    // and after we've processed all of the meshes we then recursively process each of the children nodes
 	void Model::processNode(aiNode* node, const aiScene* scene)
 	{
-		// process each mesh located at the current node
+		
 		for (unsigned int i = 0; i < node->mNumMeshes; i++)
 		{
 			aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
 			meshes.push_back(processMesh(mesh, scene));
 		}
-		// after we've processed all of the meshes we then recursively process each of the children nodes
+		
 		for (unsigned int i = 0; i < node->mNumChildren; i++)
 		{
 			processNode(node->mChildren[i], scene);
 		}
 	}
 
+    // Fill the data then walk through each of the mesh's vertices
 	Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
 	{
-        // data to fill
         std::vector<Vertex> vertices;
         std::vector<unsigned int> indices;
         std::vector<Texture> textures;
 
-        // walk through each of the mesh's vertices
         for (unsigned int i = 0; i < mesh->mNumVertices; i++)
         {
             Vertex vertex;
@@ -168,17 +172,16 @@ namespace Galactica
 
             vertices.push_back(vertex);
         }
-        // now wak through each of the mesh's faces and retrieve the corresponding vertex indices.
+        
         for (unsigned int i = 0; i < mesh->mNumFaces; i++)
         {
             aiFace face = mesh->mFaces[i];
-            // retrieve all indices of the face and store them in the indices vector
             for (unsigned int j = 0; j < face.mNumIndices; j++)
                 indices.push_back(face.mIndices[j]);
         }
+
         // process materials
         aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-
         // 1. diffuse maps
         std::vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
         textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
@@ -194,7 +197,6 @@ namespace Galactica
 
         ExtractBoneWeightForVertices(vertices, mesh, scene);
 
-        // return a mesh object created from the extracted mesh data
         return Mesh(vertices, indices, textures);
 	}
 
@@ -206,14 +208,13 @@ namespace Galactica
         {
             aiString str;
             mat->GetTexture(type, i, &str);
-            // check if texture was loaded before and if so, continue to next iteration: skip loading a new texture
             bool skip = false;
             for (unsigned int j = 0; j < textureLoaded.size(); j++)
             {
                 if (std::strcmp(textureLoaded[j].path.data(), str.C_Str()) == 0)
                 {
                     textures.push_back(textureLoaded[j]);
-                    skip = true; // a texture with the same filepath has already been loaded, continue to next one. (optimization)
+                    skip = true;
                     break;
                 }
             }
@@ -230,6 +231,28 @@ namespace Galactica
         return textures;
 	}
 
+	void Model::Bonelines(aiNode* node, BoneLine bone_lines)
+	{
+		if (auto parentNode = node->mParent)
+        {
+            bone_lines.start = { node->mTransformation.a4, node->mTransformation.b4, node->mTransformation.c4 };
+            bone_lines.end = { parentNode->mTransformation.a4, parentNode->mTransformation.b4, parentNode->mTransformation.c4 };
+
+            boneLines.push_back(bone_lines);
+        }
+
+        for (unsigned int i = 0; i < node->mNumChildren; i++)
+        {
+           Bonelines(node->mChildren[i], bone_lines);
+        }
+	}
+
+	std::vector<BoneLine> Model::GetBoneLines()
+	{
+        return boneLines;
+	}
+
+	//Read in a Texture from File
 	unsigned TextureFromFile(const char* path, const std::string& directory, bool gamma)
 	{
         std::string filename = std::string(path);

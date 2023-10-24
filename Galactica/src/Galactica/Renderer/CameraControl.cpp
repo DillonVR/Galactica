@@ -92,9 +92,9 @@ namespace Galactica
 	void CameraControl::SetViewportSize(float width, float height)
 	{
 		cameraViewportWidth = width;
-		//printf("\nwidth %f", width);
+		printf("\nwidth %f", cameraViewportWidth);
 		cameraViewportHeight = height;
-		//printf("\nheight %f", height);
+		printf("\nheight %f", cameraViewportHeight);
 		 
 	}
 
@@ -129,7 +129,9 @@ namespace Galactica
 		cameraPosition = CalculatePosition();
 
 		glm::quat orientation = GetOrientation();
+
 		cameraViewMatrix = glm::translate(glm::mat4(1.0f), cameraPosition) * glm::toMat4(orientation);
+
 		cameraViewMatrix = glm::inverse(cameraViewMatrix);
 	}
 
@@ -205,6 +207,8 @@ namespace Galactica
 	{
 
 		SetViewportSize(static_cast<float>(e.GetWidth()), static_cast<float>(e.GetHeight()));
+		printf("\nWindow Width %d",e.GetWidth());
+		printf("\nWindow Height %d", e.GetHeight());
 		return false;
 	}
 }

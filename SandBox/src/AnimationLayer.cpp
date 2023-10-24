@@ -12,7 +12,7 @@
 		:	Layer("Example"),
 			AnimationShader("Shaders/animationShader.vert", "Shaders/animationShader.frag"),
 			ModelShader("Shaders/modelShader.vert", "Shaders/modelShader.frag"),
-			camera(45.0f, 1280.0f / 720.0f, 0.1f, 1000)
+			camera(45.0f, 1, 0.1f, 1000)
 	{
 		int size = 10;
 
@@ -43,18 +43,23 @@
 			}
 		}
 
-		Galactica::Texture texture;
-		texture.id = 0;
-		texture.path = "assets/Materials/Floor.jpg";
-		textures.push_back(texture);
+		// Galactica::Texture texture;
+		// texture.id = 0;
+		// texture.path = "assets/Materials/Floor.jpg";
+		// textures.push_back(texture);
 
 		//int floor mesh
-		floormesh.lineMesh(vertices, indices, textures);
+		floormesh.lineMesh(vertices, indices);
+		
 
 		//load the models
 		ourModel.LoadModel("assets/Paladin/Paladin.dae", false);
 		backpackModel.LoadModel("assets/backpack/backpack.obj", false);
 
+		skelly = ourModel.GetBoneLines();
+
+		//bones.lineMesh(skelly.data(),skelly.data()->end)
+		
 		//load the animations
 		animation.LoadAnimation("assets/Animations/SillyDancing.dae", &ourModel);
 		Walking.LoadAnimation("assets/Animations/Walking.dae", &ourModel);
@@ -71,9 +76,9 @@
 		animator.UpdateAnimation(ts);
 
 		const glm::mat4 projection = camera.GetViewProjection();
-		
-		
+
 		//animation draw
+		
 		AnimationShader.Use();
 		AnimationShader.setMat4("projectionView", projection);
 
@@ -82,14 +87,16 @@
 		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
 
 		AnimationShader.setMat4("animation", model);
-		//auto bonemap = ourModel.boneMap;
 
 		const auto transforms = animator.GetFinalBoneMatrices();
 		for (int i = 0; i < transforms.size(); ++i)
 			AnimationShader.setMat4("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
 
 		if (showSkin)
+		{
 			ourModel.DrawModel(AnimationShader);
+		}
+
 
 		//model draw
 		ModelShader.Use();
@@ -105,7 +112,7 @@
 		backpackModel.DrawModel(ModelShader);
 
 		//Draw floor
-		floormesh.renderline(true);
+		floormesh.DebugMode(true);
 		float angleInDegrees = 180.0f;
 		float angleInRadians = glm::radians(angleInDegrees);
 
@@ -117,7 +124,9 @@
 		ModelShader.setMat4("model", floor);
 
 		floormesh.DrawMesh(ModelShader);
-		floormesh.renderline(false);
+
+		if (!debugMode)
+			floormesh.DebugMode(false);
 		
 	}
 
@@ -127,11 +136,12 @@
 
 		ImGui::Begin("Settings");
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+		ImGui::Checkbox("Debug", &debugMode);
 		ImGui::Checkbox("Bones", &showBones);
 		ImGui::Checkbox("Skin", &showSkin);
 
 		const char* items[] = {"Walking","Dancing","Strafe"};
-		static int item_current_idx = 0; // Here we store our selection data as an index.
+		static int item_current_idx = 0; 
 		static int item_last_idx = 0;
 		
 		if (ImGui::BeginListBox("Animations"))
