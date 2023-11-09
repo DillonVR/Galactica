@@ -14,6 +14,7 @@ namespace Galactica
 		std::string name;
 		int childNum;
 		std::vector<AssimpNodeData> children;
+		AssimpNodeData* parent;
 
 	};
 	class GALACTICA_API Animation

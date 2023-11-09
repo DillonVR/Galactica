@@ -1,11 +1,9 @@
 #pragma once
 
-#include <cmath>
-#include <algorithm>
-#include "MathFunctions.h"
 #include "Quaternion.h"
+#include "Constants.h"
 
-namespace Galactica::Math
+namespace Galactica
 {
 	template <typename T>
 	Quaternion<T>::Quaternion()
@@ -66,6 +64,26 @@ namespace Galactica::Math
 		this->z /= norm;
 		this->w /= norm;
 		return *this;
+	}
+
+	template<typename T>
+	Quaternion<T> Quaternion<T>::Normalize(const Quaternion& quat)
+	{
+		Quaternion newQuat(quat);
+
+		T length = Length(newQuat);
+
+		if (length <= static_cast<T>(0))
+		{
+			return Quaternion();
+		}
+
+		float inverseLength = static_cast<T>(1) / Length(newQuat);
+		newQuat.x *= inverseLength;
+		newQuat.y *= inverseLength;
+		newQuat.z *= inverseLength;
+		newQuat.w *= inverseLength;
+		return newQuat;
 	}
 
 	template <typename T>
@@ -189,10 +207,10 @@ namespace Galactica::Math
 
 		float absQ2 = std::pow(matrix.Determinant(), static_cast<T>(1) / static_cast<T>(3));
 
-		w = std::sqrt(std::max(static_cast<T>(0), absQ2 + m00 + m11 + m22)) / static_cast<T>(2);
-		x = std::sqrt(std::max(static_cast<T>(0), absQ2 + m00 - m11 - m22)) / static_cast<T>(2);
-		y = std::sqrt(std::max(static_cast<T>(0), absQ2 - m00 + m11 - m22)) / static_cast<T>(2);
-		z = std::sqrt(std::max(static_cast<T>(0), absQ2 - m00 - m11 + m22)) / static_cast<T>(2);
+		w = std::sqrt(std::max<T>(static_cast<T>(0), absQ2 + m00 + m11 + m22)) / static_cast<T>(2);
+		x = std::sqrt(std::max<T>(static_cast<T>(0), absQ2 + m00 - m11 - m22)) / static_cast<T>(2);
+		y = std::sqrt(std::max<T>(static_cast<T>(0), absQ2 - m00 + m11 - m22)) / static_cast<T>(2);
+		z = std::sqrt(std::max<T>(static_cast<T>(0), absQ2 - m00 - m11 + m22)) / static_cast<T>(2);
 
 		x = std::copysign(x, matrix(2, 1) - matrix(1, 2));
 		y = std::copysign(y, matrix(0, 2) - matrix(2, 0));
@@ -209,15 +227,15 @@ namespace Galactica::Math
 		T one = static_cast<T>(1);
 		T two = static_cast<T>(2);
 
-		if(singularityTest > NORTH_POLE_SINGULARITY_VALUE)
+		if (singularityTest > NORTH_POLE_SINGULARITY_VALUE)
 		{
 			angles.y = two * std::atan2(x, w);
-			angles.z = static_cast<T>(F_PI) / two;
+			angles.z = static_cast<T>(PI_F) / two;
 		}
-		else if(singularityTest < SOUTH_POLE_SINGULARITY_VALUE)
+		else if (singularityTest < SOUTH_POLE_SINGULARITY_VALUE)
 		{
 			angles.y = -two * std::atan2(x, w);
-			angles.z = -static_cast<T>(F_PI) / two;
+			angles.z = -static_cast<T>(PI_F) / two;
 		}
 		else
 		{
@@ -253,9 +271,9 @@ namespace Galactica::Math
 	T Quaternion<T>::Dot(const Quaternion<T>& leftQuaternion, const Quaternion<T>& rightQuaternion)
 	{
 		return leftQuaternion.x * rightQuaternion.x +
-			   leftQuaternion.y * rightQuaternion.y +
-			   leftQuaternion.z * rightQuaternion.z +
-			   leftQuaternion.w * rightQuaternion.w;
+			leftQuaternion.y * rightQuaternion.y +
+			leftQuaternion.z * rightQuaternion.z +
+			leftQuaternion.w * rightQuaternion.w;
 	}
 
 	template <typename T>
@@ -329,19 +347,48 @@ namespace Galactica::Math
 	}
 
 	template <typename T>
-	Quaternion<T> Quaternion<T>::Slerp(const Quaternion<T>& leftQuaternion, const Quaternion<T>& rightQuaternion, const T t)
+	Quaternion<T> Quaternion<T>::Slerp(const Quaternion<T>& leftQuaternion, const Quaternion<T>& rightQuaternion,T t)
 	{
-		float dot = Quaternion<T>::Dot(leftQuaternion, rightQuaternion);
+		T dot = Quaternion<T>::Dot(leftQuaternion, rightQuaternion);
 
-		if (dot > DOT_THRESHOLD)
+		Quaternion rightCopy = rightQuaternion;
+
+		if (dot < static_cast<T>(0))
+		{
+			rightCopy = static_cast<T>(-1) * rightCopy;
+			dot = -dot;
+		}
+
+		if (dot > static_cast<T>(1) - EPSILON)
 		{
 			return Nlerp(leftQuaternion, rightQuaternion, t);
 		}
 
-		dot = std::clamp(dot, static_cast<T>(-1), static_cast<T>(1));
-		T theta = std::acos(dot) * t; // Angle between leftQuaternion and new quaternion at t
-		Quaternion<T> nlerpedQuaternion = Nlerp(leftQuaternion, rightQuaternion, dot);
-		return leftQuaternion * std::cos(theta) + nlerpedQuaternion * std::sin(theta);
+		T clampT = std::clamp(t, static_cast<T>(0), static_cast<T>(1));
+		T theta = std::acos(dot); 
+		
+		return (std::sin((static_cast<T>(1) - clampT) * theta) * leftQuaternion + std::sin(clampT * theta) * rightCopy) / std::sin(theta);
+	}
+
+	template <typename T>
+	T Quaternion<T>::LengthSquared(const Quaternion& quat)
+	{
+		return (
+			quat.x * quat.x +
+			quat.y * quat.y +
+			quat.z * quat.z +
+			quat.w * quat.w);
+	}
+
+	template <typename T>
+	T Quaternion<T>::Length(const Quaternion& quat)
+	{
+		T lengthSquared = LengthSquared(quat);
+
+		if (lengthSquared <= static_cast<T>(EPSILON))
+			return static_cast<T>(0);
+
+		return std::sqrt(lengthSquared);
 	}
 
 	template <typename T>
@@ -355,14 +402,14 @@ namespace Galactica::Math
 	}
 
 	template <typename T>
-	Quaternion<T>& Quaternion<T>::operator*=(const Quaternion<T>& quaterion)
+	Quaternion<T>& Quaternion<T>::operator*=(const Quaternion<T>& quaternion)
 	{
 		Quaternion<T> temp = *this;
 
-		this->x = temp.w * quaterion.x + temp.x * quaterion.w + temp.y * quaterion.z - temp.z * quaterion.y;
-		this->y = temp.w * quaterion.y + temp.y * quaterion.w + temp.z * quaterion.x - temp.x * quaterion.z;
-		this->z = temp.w * quaterion.z + temp.z * quaterion.w + temp.x * quaterion.y - temp.y * quaterion.x;
-		this->w = temp.w * quaterion.w - temp.x * quaterion.x - temp.y * quaterion.y - temp.z * quaterion.z;
+		this->x = temp.w * quaternion.x + temp.x * quaternion.w + temp.y * quaternion.z - temp.z * quaternion.y;
+		this->y = temp.w * quaternion.y + temp.y * quaternion.w + temp.z * quaternion.x - temp.x * quaternion.z;
+		this->z = temp.w * quaternion.z + temp.z * quaternion.w + temp.x * quaternion.y - temp.y * quaternion.x;
+		this->w = temp.w * quaternion.w - temp.x * quaternion.x - temp.y * quaternion.y - temp.z * quaternion.z;
 
 		return *this;
 	}
@@ -408,142 +455,70 @@ namespace Galactica::Math
 	}
 
 	template <typename T>
-	Quaternion<T> operator*(const Quaternion<T>& leftQuaterion, const Quaternion<T>& rightQuaterion)
+	Quaternion<T> operator*(const Quaternion<T>& leftQuaternion, const Quaternion<T>& rightQuaternion)
 	{
-		Quaternion<T> leftQuaterionCopy = leftQuaterion;
-		return leftQuaterionCopy *= rightQuaterion;
+		Quaternion<T> leftQuaterionCopy = leftQuaternion;
+		return leftQuaterionCopy *= rightQuaternion;
 	}
 
 	template <typename T>
-	Quaternion<T> operator*(const Quaternion<T>& quaterion, const T scalar)
+	Quaternion<T> operator*(const Quaternion<T>& quaterion, T scalar)
 	{
 		Quaternion quaterionCopy = quaterion;
 		return quaterionCopy *= scalar;
 	}
 
 	template<typename T>
-	Quaternion<T> operator*(const T scalar, const Quaternion<T>& quaterion)
+	Quaternion<T> operator*(T scalar, const Quaternion<T>& quaternion)
 	{
-		Quaternion quaterionCopy = quaterion;
+		Quaternion quaterionCopy = quaternion;
 		return quaterionCopy *= scalar;
 	}
 
 	template <typename T>
-	Quaternion<T> operator/(const Quaternion<T>& quaterion, const T scalar)
+	Quaternion<T> operator/(const Quaternion<T>& quaternion, const T scalar)
 	{
-		Quaternion<T> quaterionCopy = quaterion;
+		Quaternion<T> quaterionCopy = quaternion;
 		return quaterionCopy /= scalar;
 	}
 
 	template<typename T>
-	Quaternion<T> operator/(const T scalar, const Quaternion<T>& quaterion)
+	Quaternion<T> operator/(const T scalar, const Quaternion<T>& quaternion)
 	{
-		Quaternion<T> quaterionCopy = quaterion;
+		Quaternion<T> quaterionCopy = quaternion;
 		return quaterionCopy /= scalar;
 	}
 
 	template <typename T>
-	Quaternion<T> operator+(const Quaternion<T>& leftQuaterion, const Quaternion<T>& rightQuaterion)
+	Quaternion<T> operator+(const Quaternion<T>& leftQuaternion, const Quaternion<T>& rightQuaternion)
 	{
-		Quaternion<T> leftQuaterionCopy = leftQuaterion;
-		return leftQuaterionCopy += rightQuaterion;
+		Quaternion<T> leftQuaterionCopy = leftQuaternion;
+		return leftQuaterionCopy += rightQuaternion;
 	}
 
 	template <typename T>
-	Quaternion<T> operator-(const Quaternion<T>& leftQuaterion, const Quaternion<T>& rightQuaterion)
+	Quaternion<T> operator-(const Quaternion<T>& leftQuaternion, const Quaternion<T>& rightQuaternion)
 	{
-		Quaternion<T> leftQuaterionCopy = leftQuaterion;
-		return leftQuaterionCopy -= rightQuaterion;
+		Quaternion<T> leftQuaterionCopy = leftQuaternion;
+		return leftQuaterionCopy -= rightQuaternion;
 	}
 
 	template <typename T>
-	std::ostream& operator<<(std::ostream& stream, const Quaternion<T>& quaternion)
+	Quaternion<T> Quaternion<T>::Add(const Quaternion& quaternion)
 	{
-		stream << "([" << quaternion.x << ", " << quaternion.y << ", " << quaternion.z << "], " << quaternion.w << ")";
-		return stream;
+		return (*this) + quaternion;
 	}
 
 	template <typename T>
-	void Quaternion<T>::InitializeClassWithSol(const std::shared_ptr<sol::state>& luaState)
+	Quaternion<T> Quaternion<T>::Subtract(const Quaternion& quaternion)
 	{
-		luaState->new_usertype<Quaternion>(
-			"Quaternion",
-
-			"x", &Quaternion::x,
-			"y", &Quaternion::y,
-			"z", &Quaternion::z,
-			"w", &Quaternion::w,
-
-			"new", sol::constructors<
-				Quaternion(),
-				Quaternion(T, T, T, T),
-				Quaternion(const Vec3<T>&, T),
-				Quaternion(const Quaternion&)
-			>(),
-
-			sol::meta_function::to_string,		&Quaternion::ToString,
-			sol::meta_function::addition,		&Quaternion::Add,
-			sol::meta_function::subtraction,	&Quaternion::Subtract,
-
-			sol::meta_function::multiplication, sol::overload(
-				sol::resolve<Quaternion(const Quaternion&)>(&Quaternion::Multiply), 
-				sol::resolve<Quaternion(T)>(&Quaternion::Multiply)),
-
-			sol::meta_function::division,		&Quaternion::Divide,
-
-			// Class Functions
-			"Norm",								&Quaternion::Norm,
-			"SqrNorm",							&Quaternion::SqrNorm,
-			"GetNormalize",						&Quaternion::GetNormalize,
-			"Normalize",						&Quaternion::Normalize,
-			"GetRenormalize",					&Quaternion::GetRenormalize,
-			"Renormalize",						&Quaternion::Renormalize,
-			"GetInverse",						&Quaternion::GetInverse,
-			"Inverse",							&Quaternion::Inverse,
-			"GetConjugate",						&Quaternion::GetConjugate,
-			"GetRotationMatrix",				&Quaternion::GetRotationMatrix,
-			"SetOrthogonalRotationMatrix",		&Quaternion::SetOrthogonalRotationMatrix,
-			"SetNonOrthogonalRotationMatrix",	&Quaternion::SetNonOrthogonalRotationMatrix,
-			"GetEulerAngles",					&Quaternion::GetEulerAngles
-		);
-
-		// Static Functions
-		luaState->set_function("TransformVector",		 &Quaternion::TransformVector);
-		luaState->set_function("Dot",					 &Quaternion::Dot);
-		luaState->set_function("MakeRotationX",			 &Quaternion::MakeRotationX);
-		luaState->set_function("MakeRotationY",			 &Quaternion::MakeRotationY);
-		luaState->set_function("MakeRotationZ",			 &Quaternion::MakeRotationZ);
-		luaState->set_function("MakeRotationAxisAngle",	 &Quaternion::MakeRotationAxisAngle);
-		luaState->set_function("MakeRotationFromEulers", &Quaternion::MakeRotationFromEulers);
-		luaState->set_function("Lerp",					 &Quaternion::Lerp);
-		luaState->set_function("Nlerp",					 &Quaternion::Nlerp);
-		luaState->set_function("Slerp",					 &Quaternion::Slerp);
+		return (*this) - quaternion;
 	}
 
 	template <typename T>
-	const std::string Quaternion<T>::ToString() const
+	Quaternion<T> Quaternion<T>::Multiply(const Quaternion& quaternion)
 	{
-		std::string quaternionString = 
-			"( " + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + ", " + std::to_string(w) + " )";
-		return quaternionString;
-	}
-
-	template <typename T>
-	Quaternion<T> Quaternion<T>::Add(const Quaternion& quat)
-	{
-		return (*this) + quat;
-	}
-
-	template <typename T>
-	Quaternion<T> Quaternion<T>::Subtract(const Quaternion& quat)
-	{
-		return (*this) - quat;
-	}
-
-	template <typename T>
-	Quaternion<T> Quaternion<T>::Multiply(const Quaternion& quat)
-	{
-		return (*this) * quat;
+		return (*this) * quaternion;
 	}
 
 	template <typename T>

@@ -48,6 +48,7 @@ namespace Galactica{
         void DrawMesh(Shader& shader);
 
 		std::vector<Vertex> vertices;
+		//std::vector<BoneLine> bones;
         std::vector<unsigned int> indices;
         std::vector<Texture> textures;
         unsigned int VAO;

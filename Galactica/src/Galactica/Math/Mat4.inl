@@ -1,41 +1,31 @@
 #pragma once
 
-#include <cstring>
-#include <cmath>
-#include <cstdint>
-#include "MathFunctions.h"
-#include "NightOwl/Core/Utitlity/Assert.h"
-#include "NightOwl/Core/Utitlity/Logging/LoggerManager.h"
-#include <sol/sol.hpp>
+#include "Mat4.h"
 
-namespace Galactica::Math
+namespace Galactica
 {
 	template <typename T>
-	Mat4<T>::Mat4()
-		: data{ 0 }
-	{ }
-
-	template<typename T>
-	Mat4<T>::Mat4(std::initializer_list<T> args)
+	constexpr Mat4<T>::Mat4() noexcept
+		:	data{0}
 	{
-		std::uint8_t column = 0, row = 0;
-		for (auto& element : args)
-		{
-			this->data[column][row] = element;
-			column++;
-			if (column == 4)
-			{
-				column = 0;
-				row++;
-			}
-		}
 	}
 
 	template <typename T>
-	Mat4<T>::Mat4(const T m00, const T m01, const T m02, const T m03,
+	constexpr Mat4<T>::Mat4(float diagonal) noexcept
+		: data{ 0 }
+	{
+		data[0][0] = diagonal;
+		data[1][1] = diagonal;
+		data[2][2] = diagonal;
+		data[3][3] = diagonal;
+	}
+
+	template <typename T>
+	constexpr  Mat4<T>::Mat4(const T m00, const T m01, const T m02, const T m03,
 		const T m10, const T m11, const T m12, const T m13,
 		const T m20, const T m21, const T m22, const T m23,
-		const T m30, const T m31, const T m32, const T m33)
+		const T m30, const T m31, const T m32, const T m33) noexcept
+		: data{ 0 }
 	{
 		// Column-major ordering
 		data[0][0] = m00;
@@ -60,10 +50,28 @@ namespace Galactica::Math
 	}
 
 	template <typename T>
+	constexpr Mat4<T>::Mat4(std::initializer_list<T> list) noexcept
+		: data{ 0 }
+	{
+		std::uint8_t column = 0, row = 0;
+		for (auto& element : list)
+		{
+			this->data[column][row] = element;
+			column++;
+			if (column == 4)
+			{
+				column = 0;
+				row++;
+			}
+		}
+	}
+
+	template <typename T>
 	Mat4<T>::Mat4(const Vec4<T>& firstRow,
 		const Vec4<T>& secondRow,
 		const Vec4<T>& thirdRow,
-		const Vec4<T>& fourthRow)
+		const Vec4<T>& fourthRow) noexcept
+		: data{ 0 }
 	{
 
 		data[0][0] = firstRow.x;
@@ -88,23 +96,161 @@ namespace Galactica::Math
 	}
 
 	template <typename T>
-	Mat4<T>::Mat4(const T diagonal)
-		: data{ 0 }
+	Vec4<T>& Mat4<T>::operator[](unsigned i)
 	{
-		data[0][0] = diagonal;
-		data[1][1] = diagonal;
-		data[2][2] = diagonal;
-		data[3][3] = diagonal;
+		return this->columns[i];
 	}
 
 	template <typename T>
-	Mat4<T>::Mat4(const Mat4<T>& matrix)
+	const Vec4<T>& Mat4<T>::operator[](unsigned i) const
 	{
-		std::memcpy(data, matrix.data, sizeof(Mat4<T>));
+		return this->columns[i];
 	}
 
 	template <typename T>
-	Mat4<T> Mat4<T>::GetInverse() const
+	bool Mat4<T>::operator==(const Mat4& leftMatrix, const Mat4& rightMatrix)
+	{
+		for (int i = 0; i < 16; ++i) {
+			if (std::fabsf(leftMatrix.data[i] - rightMatrix.data[i]) > EPSILON) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	template <typename T>
+	bool Mat4<T>::operator!=(const Mat4& leftMatrix, const Mat4& rightMatrix)
+	{
+		return !(leftMatrix == rightMatrix);
+	}
+
+	template <typename T>
+	Mat4<T> Mat4<T>::operator+(const Mat4& leftMatrix, const Mat4& rightMatrix)
+	{
+		Mat4 left_matrix(leftMatrix);
+		return left_matrix += rightMatrix;
+	}
+
+	template <typename T>
+	Mat4<T> Mat4<T>::operator*(const Mat4& matrix, float value)
+	{
+		Mat4 matrix1(matrix);
+		return matrix1 *= value;
+	}
+
+	template <typename T>
+	Vec4<T> Mat4<T>::operator*(const Mat4& matrix, const Vec4<T>& vector)
+	{
+		Mat4 matrix1(matrix);
+		return matrix1 *= vector;
+	}
+
+	template <typename T>
+	Mat4<T> Mat4<T>::operator*(const Mat4& leftMatrix, const Mat4& rightMatrix)
+	{
+		Mat4 left_matrix(leftMatrix);
+		return left_matrix *= rightMatrix;
+	}
+
+	template <typename T>
+	Vec3<T> Mat4<T>::operator*(const Mat4& matrix, const Vec3<T>& vector)
+	{
+		Mat4 matrix1(matrix);
+		return matrix1 *= vector;
+	}
+
+	template <typename T>
+	Vec3<T> Mat4<T>::TransformVector(const Mat4& matrix, const Vec3<T>& vector)
+	{
+		return Vec3<T>(
+			matrix[0] * vector,
+			matrix[1] * vector,
+			matrix[2] * vector
+		);
+	}
+
+	template <typename T>
+	Vec3<T> Mat4<T>::TransformPoint(const Mat4& matrix, const Vec3<T>& point)
+	{
+		columns.reserve(4);
+		columns.emplace_back(point, 1);
+		columns.emplace_back(point, 1);
+		columns.emplace_back(point, 1);
+		columns.emplace_back(point, 1);
+
+		return Vec3<T>(
+			matrix[0] * point,
+			matrix[1] * point,
+			matrix[2] * point
+		);
+	}
+
+	template <typename T>
+	Vec3<T> Mat4<T>::TransformPoint(const Mat4& matrix, const Vec3<T>& point, float& w)
+	{
+		columns.reserve(4);
+		columns.emplace_back(point, w);
+		columns.emplace_back(point, w);
+		columns.emplace_back(point, w);
+		columns.emplace_back(point, w);
+
+		return Vec3<T>(
+			matrix[0] * point,
+			matrix[1] * point,
+			matrix[2] * point
+		);
+	}
+
+	template <typename T>
+	Mat4<T>& Mat4<T>::Transpose()
+	{
+		Mat4<T> temp = *this;
+
+		data[0][1] = temp.data[1][0];
+		data[0][2] = temp.data[2][0];
+		data[0][3] = temp.data[3][0];
+
+		data[1][0] = temp.data[0][1];
+		data[1][2] = temp.data[2][1];
+		data[1][3] = temp.data[3][1];
+
+		data[2][0] = temp.data[0][2];
+		data[2][1] = temp.data[1][2];
+		data[2][3] = temp.data[3][2];
+
+		data[3][0] = temp.data[0][3];
+		data[3][1] = temp.data[1][3];
+		data[3][2] = temp.data[2][3];
+
+		return *this;
+	}
+
+
+	template <typename T>
+	float Mat4<T>::Determinant() const
+	{
+		const Vec3<T> a = reinterpret_cast<const Vec3<T>&>(data[0]);
+		const Vec3<T> b = reinterpret_cast<const Vec3<T>&>(data[1]);
+		const Vec3<T> c = reinterpret_cast<const Vec3<T>&>(data[2]);
+		const Vec3<T> d = reinterpret_cast<const Vec3<T>&>(data[3]);
+
+		Vec3<T> s = Vec3<T>::Cross(a, b);
+		Vec3<T> t = Vec3<T>::Cross(c, d);
+		Vec3<T> u = a * data[1][3] - b * data[0][3];
+		Vec3<T> v = c * data[3][3] - d * data[2][3];
+
+		return Vec3<T>::Dot(s, v) - Vec3<T>::Dot(t, u);
+	}
+
+	//TODO:
+	template <typename T>
+	Mat4<T> Mat4<T>::Adjugate(const Mat4& matrix)
+	{
+		return {};
+	}
+
+	template <typename T>
+	Mat4<T> Mat4<T>::Invert(Mat4& matrix)
 	{
 		const Vec3<T> a = reinterpret_cast<const Vec3<T>&>(data[0]);
 		const Vec3<T> b = reinterpret_cast<const Vec3<T>&>(data[1]);
@@ -132,10 +278,10 @@ namespace Galactica::Math
 		Vec3<T> thirdRow = Vec3<T>::Cross(d, u) + s * w;
 		Vec3<T> fourthRow = Vec3<T>::Cross(u, c) - s * z;
 
-		return Mat4<T>( firstRow.x,  firstRow.y,  firstRow.z, -Vec3<T>::Dot(b, t),
-					   secondRow.x, secondRow.y, secondRow.z,  Vec3<T>::Dot(a, t),
-					    thirdRow.x,  thirdRow.y,  thirdRow.z, -Vec3<T>::Dot(d, s),
-					   fourthRow.x, fourthRow.y, fourthRow.z,  Vec3<T>::Dot(c, s));
+		return Mat4<T>(firstRow.x, firstRow.y, firstRow.z, -Vec3<T>::Dot(b, t),
+			secondRow.x, secondRow.y, secondRow.z, Vec3<T>::Dot(a, t),
+			thirdRow.x, thirdRow.y, thirdRow.z, -Vec3<T>::Dot(d, s),
+			fourthRow.x, fourthRow.y, fourthRow.z, Vec3<T>::Dot(c, s));
 	}
 
 	template <typename T>
@@ -188,553 +334,5 @@ namespace Galactica::Math
 		data[3][3] = Vec3<T>::Dot(c, s);
 
 		return *this;
-	}
-
-	template <typename T>
-	Mat4<T> Mat4<T>::GetTranspose() const
-	{
-		return Mat4<T>(data[0][0], data[0][1], data[0][2], data[0][3],
-					   data[1][0], data[1][1], data[1][2], data[1][3],
-					   data[2][0], data[2][1], data[2][2], data[2][3],
-					   data[3][0], data[3][1], data[3][2], data[3][3]);
-	}
-
-	template <typename T>
-	Mat4<T>& Mat4<T>::Transpose()
-	{
-		Mat4<T> temp = *this;
-
-		data[0][1] = temp.data[1][0];
-		data[0][2] = temp.data[2][0];
-		data[0][3] = temp.data[3][0];
-
-		data[1][0] = temp.data[0][1];
-		data[1][2] = temp.data[2][1];
-		data[1][3] = temp.data[3][1];
-
-		data[2][0] = temp.data[0][2];
-		data[2][1] = temp.data[1][2];
-		data[2][3] = temp.data[3][2];
-
-		data[3][0] = temp.data[0][3];
-		data[3][1] = temp.data[1][3];
-		data[3][2] = temp.data[2][3];
-
-		return *this;
-	}
-
-	template <typename T>
-	float Mat4<T>::GetDeterminant() const
-	{
-		const Vec3<T> a = reinterpret_cast<const Vec3<T>&>(data[0]);
-		const Vec3<T> b = reinterpret_cast<const Vec3<T>&>(data[1]);
-		const Vec3<T> c = reinterpret_cast<const Vec3<T>&>(data[2]);
-		const Vec3<T> d = reinterpret_cast<const Vec3<T>&>(data[3]);
-
-		Vec3<T> s = Vec3<T>::Cross(a, b);
-		Vec3<T> t = Vec3<T>::Cross(c, d);
-		Vec3<T> u = a * data[1][3] - b * data[0][3];
-		Vec3<T> v = c * data[3][3] - d * data[2][3];
-
-		return Vec3<T>::Dot(s, v) - Vec3<T>::Dot(t, u);
-	}
-
-	template <typename T>
-	Vec4<T> Mat4<T>::GetColumn(const int columnIndex) const
-	{
-		return columns[columnIndex];
-	}
-
-	template <typename T>
-	void Mat4<T>::SetColumn(const int columnIndex, const Vec4<T>& vector)
-	{
-		columns[columnIndex] = vector;
-	}
-
-	template <typename T>
-	Vec4<T> Mat4<T>::GetRow(const int rowIndex) const
-	{
-		return Vec4<T>(data[0][rowIndex],
-					   data[1][rowIndex],
-					   data[2][rowIndex],
-					   data[3][rowIndex]);
-	}
-
-	template <typename T>
-	void Mat4<T>::SetRow(const int rowIndex, const Vec4<T>& vector)
-	{
-		data[0][rowIndex] = vector.x;
-		data[1][rowIndex] = vector.y;
-		data[2][rowIndex] = vector.z;
-		data[3][rowIndex] = vector.w;
-	}
-
-	template <typename T>
-	Vec3<T> Mat4<T>::GetTranslation() const
-	{
-		return columns[3].xyz;
-	}
-
-	template <typename T>
-	void Mat4<T>::SetTranslation(const Vec3<T>& translation)
-	{
-		columns[3].x = translation.x;
-		columns[3].y = translation.y;
-		columns[3].z = translation.z;
-	}
-
-	template <typename T>
-	Vec3<T> Mat4<T>::GetScale() const
-	{
-		Vec3F scale;
-
-		scale.x = GetColumn(0).Magnitude();
-		scale.y = GetColumn(1).Magnitude();
-		scale.z = GetColumn(2).Magnitude();
-
-		return scale;
-	}
-
-	template <typename T>
-	Vec3<T> Mat4<T>::GetScale()
-	{
-		T xScale = std::sqrt(data[0][0] * data[0][0] + data[1][0] * data[1][0] + data[2][0] * data[2][0]);
-		T yScale = std::sqrt(data[0][1] * data[0][1] + data[1][1] * data[1][1] + data[2][1] * data[2][1]);
-		T zScale = std::sqrt(data[0][2] * data[0][2] + data[1][2] * data[1][2] + data[2][2] * data[2][2]);
-
-		return Vec3<T>(xScale, yScale, zScale);
-	}
-
-	template <typename T>
-	Mat4<T> Mat4<T>::GetAffineMatrix() const
-	{
-		return Mat4<T>(data[0][0], data[1][0], data[2][0], 0,
-					   data[0][1], data[1][1], data[2][1], 0,
-					   data[0][2], data[1][2], data[2][2], 0,
-								0,			0,			0, 1);
-	}
-
-	template <typename T>
-	Mat4<T> Mat4<T>::GetNormalMatrix() const
-	{
-		return GetAffineMatrix().GetInverse().GetTranspose();
-	}
-
-	template <typename T>
-	Mat3<T> Mat4<T>::GetRotationMatrix() const
-	{
-		Mat3<T> rotationMatrix;
-
-		rotationMatrix.data[0][0] = data[0][0];
-		rotationMatrix.data[1][0] = data[1][0];
-		rotationMatrix.data[2][0] = data[2][0];
-
-		rotationMatrix.data[0][1] = data[0][1];
-		rotationMatrix.data[1][1] = data[1][1];
-		rotationMatrix.data[2][1] = data[2][1];
-
-		rotationMatrix.data[0][2] = data[0][2];
-		rotationMatrix.data[1][2] = data[1][2];
-		rotationMatrix.data[2][2] = data[2][2];
-
-		return rotationMatrix;
-	}
-
-	template<typename T>
-	const T* Mat4<T>::GetValuePointer() const
-	{
-		return data[0];
-	}
-
-	template <typename T>
-	Mat4<T> Mat4<T>::MakeRotationX(const T angleInDegrees)
-	{
-		T radians = DegreesToRad(angleInDegrees);
-		T cos = std::cos(radians);
-		T sin = std::sin(radians);
-
-		return Mat4<T>(1,   0,    0, 0,
-					   0, cos, -sin, 0,
-					   0, sin,  cos, 0,
-					   0,   0,    0, 1);
-	}
-
-	template <typename T>
-	Mat4<T> Mat4<T>::MakeRotationY(const T angleInDegrees)
-	{
-		T radians = DegreesToRad(angleInDegrees);
-		T cos = std::cos(radians);
-		T sin = std::sin(radians);
-
-		return Mat4<T>( cos, 0, sin, 0,
-						  0, 1,   0, 0,
-					   -sin, 0, cos, 0,
-						  0, 0,   0, 1);
-	}
-
-	template <typename T>
-	Mat4<T> Mat4<T>::MakeRotationZ(const T angleInDegrees)
-	{
-		T radians = DegreesToRad(angleInDegrees);
-		T cos = std::cos(radians);
-		T sin = std::sin(radians);
-
-		return Mat4<T>(cos, -sin, 0, 0,
-					   sin,  cos, 0, 0,
-						 0,    0, 1, 0,
-						 0,    0, 0, 1);
-	}
-
-	template <typename T>
-	Mat4<T> Mat4<T>::MakeRotation(const Vec3<T>& axis, const T angleInDegrees)
-	{
-		T radians = DegreesToRad(angleInDegrees);
-		T cos = std::cos(radians);
-		T sin = std::sin(radians);
-		T oneMinsCos = static_cast<T>(1) - cos;
-
-		T x = axis.x * oneMinsCos;
-		T y = axis.y * oneMinsCos;
-		T z = axis.z * oneMinsCos;
-		T axisXAxisY = x * axis.y;
-		T axisXAxisZ = x * axis.z;
-		T axisYAxisZ = y * axis.z;
-
-		return Mat4<T>(			cos + x * axis.x, axisXAxisY - sin * axis.z, axisXAxisZ + sin * axis.y, 0,
-					   axisXAxisY + sin * axis.z,		   cos + y * axis.y, axisYAxisZ - sin * axis.x, 0,
-					   axisXAxisZ - sin * axis.y, axisYAxisZ + sin * axis.x,		  cos + z * axis.z, 0,
-											   0,						  0,						 0, 1);
-	}
-
-	template <typename T>
-	Mat4<T> Mat4<T>::MakeScale(const T uniformScale)
-	{
-		return Mat4<T>(uniformScale,			0,			  0, 0,
-								  0, uniformScale,			  0, 0,
-								  0,			0, uniformScale, 0,
-								  0,			0,			  0, 1);
-	}
-
-	template <typename T>
-	Mat4<T> Mat4<T>::MakeScale(const T scaleX, const T scaleY, const T scaleZ)
-	{
-		return Mat4<T>(scaleX,		0,		0, 0,
-							0, scaleY,		0, 0,
-							0,		0, scaleZ, 0,
-							0,		0,		0, 1);
-	}
-
-	template <typename T>
-	Mat4<T> Mat4<T>::MakeScale(const Vec3<T>& vector)
-	{
-		return Mat4<T>(vector.x,		0,		  0, 0,
-							  0, vector.y,		  0, 0,
-							  0,		0, vector.z, 0,
-							  0,		0,		  0, 1);
-	}
-
-	template <typename T>
-	Mat4<T> Mat4<T>::MakeTranslation(const T uniformTranslation)
-	{
-		return Mat4<T>(1, 0, 0, uniformTranslation,
-					   0, 1, 0, uniformTranslation,
-					   0, 0, 1, uniformTranslation,
-					   0, 0, 0,					 1);
-	}
-
-	template <typename T>
-	Mat4<T> Mat4<T>::MakeTranslation(const T translationX, const T translationY, const T translationZ)
-	{
-		return Mat4<T>(1, 0, 0, translationX,
-					   0, 1, 0, translationY,
-					   0, 0, 1, translationZ,
-					   0, 0, 0,			   1);
-	}
-
-	template <typename T>
-	Mat4<T> Mat4<T>::MakeTranslation(const Vec3<T>& vector)
-	{
-		return Mat4<T>(1, 0, 0, vector.x,
-					   0, 1, 0, vector.y,
-					   0, 0, 1, vector.z,
-					   0, 0, 0,		   1);
-	}
-
-	template <typename T>
-	Mat4<T> Mat4<T>::LookAt(const Vec3<T>& cameraPosition, const Vec3<T>& targetPosition, const Vec3<T>& up)
-	{
-		Vec3<T> forwardAxis = (cameraPosition - targetPosition).GetNormalize();
-		Vec3<T> rightAxis = Vec3<T>::Cross(up, forwardAxis).GetNormalize();
-		Vec3<T> upAxis = Vec3<T>::Cross(forwardAxis, rightAxis).GetNormalize();
-
-		return Mat4<T>(rightAxis.x,	  rightAxis.y,   rightAxis.z,   -Vec3<T>::Dot(rightAxis, cameraPosition),
-						  upAxis.x,		 upAxis.y,		upAxis.z,	   -Vec3<T>::Dot(upAxis, cameraPosition),
-					 forwardAxis.x, forwardAxis.y, forwardAxis.z, -Vec3<T>::Dot(forwardAxis, cameraPosition),
-								 0,				0,			   0,															   1);
-	}
-
-	template <typename T>
-	Mat4<T> Mat4<T>::Orthographic(const T left, const T right, const T bottom, const T top, const T near, const T far)
-	{
-				T two = static_cast<T>(2);
-		T negativeTwo = static_cast<T>(-2);
-		T negativeOne = static_cast<T>(-1);
-
-		return Mat4<T>(two / (right - left),					0,							0, negativeOne * (left + right) / (right - left),
-										  0, two / (top - bottom),							0, negativeOne * (bottom + top) / (top - bottom),
-										  0,					0, negativeTwo / (far - near),	   negativeOne * (near + far) / (far - near),
-										  0,					0,							0,											   1);
-	}
-
-	template <typename T>
-	Mat4<T> Mat4<T>::Perspective(const T fieldOfViewInDegrees, const T aspectRatio, const T near, const T far)
-	{
-		T two = static_cast<T>(2);
-		T negativeTwo = static_cast<T>(-2);
-		T one = static_cast<T>(1);
-		T negativeOne = static_cast<T>(-1);
-
-		T tangentHalfFov = std::tan(DegreesToRad(fieldOfViewInDegrees) / two);
-		T xScale = one / tangentHalfFov;
-		T yScale = aspectRatio / tangentHalfFov;
-		T farMinusNear = far - near;
-
-		return Mat4<T>(xScale,		0,											 0,										  0,
-							0, yScale,											 0,										  0,
-							0,		0, negativeOne * (far + near) / (farMinusNear), negativeTwo * far * near / farMinusNear,
-							0,		0,								   negativeOne,										  0);
-	}
-
-	template <typename T>
-	Mat4<T> Mat4<T>::Identity()
-	{
-		return Mat4<T>(1);
-	}
-
-	template <typename T>
-	Mat4<T>& Mat4<T>::operator=(const Mat4<T>& matrix)
-	{
-		std::memcpy(data, matrix.data, sizeof(Mat4<T>));
-		return *this;
-	}
-
-	template<typename T>
-	const T& Mat4<T>::operator()(const int rowIndex, const int columnIndex) const
-	{
-		return data[columnIndex][rowIndex];
-	}
-
-	template<typename T>
-	T& Mat4<T>::operator()(const int rowIndex, const int columnIndex)
-	{
-		return data[columnIndex][rowIndex];
-	}
-
-	template <typename T>
-	Mat4<T>& Mat4<T>::operator*=(const Mat4<T>& matrix)
-	{
-		Mat4<T> temp = *this;
-
-		data[0][0] = temp.data[0][0] * matrix.data[0][0] + temp.data[1][0] * matrix.data[0][1] + temp.data[2][0] * matrix.data[0][2] + temp.data[3][0] * matrix.data[0][3];
-		data[1][0] = temp.data[0][0] * matrix.data[1][0] + temp.data[1][0] * matrix.data[1][1] + temp.data[2][0] * matrix.data[1][2] + temp.data[3][0] * matrix.data[1][3];
-		data[2][0] = temp.data[0][0] * matrix.data[2][0] + temp.data[1][0] * matrix.data[2][1] + temp.data[2][0] * matrix.data[2][2] + temp.data[3][0] * matrix.data[2][3];
-		data[3][0] = temp.data[0][0] * matrix.data[3][0] + temp.data[1][0] * matrix.data[3][1] + temp.data[2][0] * matrix.data[3][2] + temp.data[3][0] * matrix.data[3][3];
-
-		data[0][1] = temp.data[0][1] * matrix.data[0][0] + temp.data[1][1] * matrix.data[0][1] + temp.data[2][1] * matrix.data[0][2] + temp.data[3][1] * matrix.data[0][3];
-		data[1][1] = temp.data[0][1] * matrix.data[1][0] + temp.data[1][1] * matrix.data[1][1] + temp.data[2][1] * matrix.data[1][2] + temp.data[3][1] * matrix.data[1][3];
-		data[2][1] = temp.data[0][1] * matrix.data[2][0] + temp.data[1][1] * matrix.data[2][1] + temp.data[2][1] * matrix.data[2][2] + temp.data[3][1] * matrix.data[2][3];
-		data[3][1] = temp.data[0][1] * matrix.data[3][0] + temp.data[1][1] * matrix.data[3][1] + temp.data[2][1] * matrix.data[3][2] + temp.data[3][1] * matrix.data[3][3];
-
-		data[0][2] = temp.data[0][2] * matrix.data[0][0] + temp.data[1][2] * matrix.data[0][1] + temp.data[2][2] * matrix.data[0][2] + temp.data[3][2] * matrix.data[0][3];
-		data[1][2] = temp.data[0][2] * matrix.data[1][0] + temp.data[1][2] * matrix.data[1][1] + temp.data[2][2] * matrix.data[1][2] + temp.data[3][2] * matrix.data[1][3];
-		data[2][2] = temp.data[0][2] * matrix.data[2][0] + temp.data[1][2] * matrix.data[2][1] + temp.data[2][2] * matrix.data[2][2] + temp.data[3][2] * matrix.data[2][3];
-		data[3][2] = temp.data[0][2] * matrix.data[3][0] + temp.data[1][2] * matrix.data[3][1] + temp.data[2][2] * matrix.data[3][2] + temp.data[3][2] * matrix.data[3][3];
-
-		data[0][3] = temp.data[0][3] * matrix.data[0][0] + temp.data[1][3] * matrix.data[0][1] + temp.data[2][3] * matrix.data[0][2] + temp.data[3][3] * matrix.data[0][3];
-		data[1][3] = temp.data[0][3] * matrix.data[1][0] + temp.data[1][3] * matrix.data[1][1] + temp.data[2][3] * matrix.data[1][2] + temp.data[3][3] * matrix.data[1][3];
-		data[2][3] = temp.data[0][3] * matrix.data[2][0] + temp.data[1][3] * matrix.data[2][1] + temp.data[2][3] * matrix.data[2][2] + temp.data[3][3] * matrix.data[2][3];
-		data[3][3] = temp.data[0][3] * matrix.data[3][0] + temp.data[1][3] * matrix.data[3][1] + temp.data[2][3] * matrix.data[3][2] + temp.data[3][3] * matrix.data[3][3];
-
-		return *this;
-	}
-
-	template <typename T>
-	Mat4<T>& Mat4<T>::operator*=(const Mat3<T>& matrix)
-	{
-		Mat4<T> temp = *this;
-
-		data[0][0] = temp.data[0][0] * matrix.data[0][0] + temp.data[1][0] * matrix.data[0][1] + temp.data[2][0] * matrix.data[0][2];
-		data[1][0] = temp.data[0][0] * matrix.data[1][0] + temp.data[1][0] * matrix.data[1][1] + temp.data[2][0] * matrix.data[1][2];
-		data[2][0] = temp.data[0][0] * matrix.data[2][0] + temp.data[1][0] * matrix.data[2][1] + temp.data[2][0] * matrix.data[2][2];
-		data[3][0] = temp.data[3][0];
-
-		data[0][1] = temp.data[0][1] * matrix.data[0][0] + temp.data[1][1] * matrix.data[0][1] + temp.data[2][1] * matrix.data[0][2];
-		data[1][1] = temp.data[0][1] * matrix.data[1][0] + temp.data[1][1] * matrix.data[1][1] + temp.data[2][1] * matrix.data[1][2];
-		data[2][1] = temp.data[0][1] * matrix.data[2][0] + temp.data[1][1] * matrix.data[2][1] + temp.data[2][1] * matrix.data[2][2];
-		data[3][1] = temp.data[3][1];
-
-		data[0][2] = temp.data[0][2] * matrix.data[0][0] + temp.data[1][2] * matrix.data[0][1] + temp.data[2][2] * matrix.data[0][2];
-		data[1][2] = temp.data[0][2] * matrix.data[1][0] + temp.data[1][2] * matrix.data[1][1] + temp.data[2][2] * matrix.data[1][2];
-		data[2][2] = temp.data[0][2] * matrix.data[2][0] + temp.data[1][2] * matrix.data[2][1] + temp.data[2][2] * matrix.data[2][2];
-		data[3][2] = temp.data[3][2];
-
-		data[0][3] = temp.data[0][3] * matrix.data[0][0] + temp.data[1][3] * matrix.data[0][1] + temp.data[2][3] * matrix.data[0][2];
-		data[1][3] = temp.data[0][3] * matrix.data[1][0] + temp.data[1][3] * matrix.data[1][1] + temp.data[2][3] * matrix.data[1][2];
-		data[2][3] = temp.data[0][3] * matrix.data[2][0] + temp.data[1][3] * matrix.data[2][1] + temp.data[2][3] * matrix.data[2][2];
-		data[3][3] = temp.data[3][3];
-
-		return *this;
-	}
-
-	template <typename T>
-	Mat4<T>& Mat4<T>::operator*=(const T scalar)
-	{
-		columns[0] *= scalar;
-		columns[1] *= scalar;
-		columns[2] *= scalar;
-		columns[3] *= scalar;
-
-		return *this;
-	}
-
-	template <typename T>
-	Mat4<T> operator*(const Mat4<T>& leftMatrix, const Mat4<T>& rightMatrix)
-	{
-		Mat4<T> leftMatrixCopy = leftMatrix;
-		return leftMatrixCopy *= rightMatrix;
-	}
-
-	template <typename T>
-	Mat4<T> operator*(const Mat4<T>& leftMatrix, const Mat3<T>& rotationMatrix)
-	{
-		Mat4<T> leftMatrixCopy = leftMatrix;
-		return leftMatrixCopy *= rotationMatrix;
-	}
-
-	template <typename T>
-	Vec4<T> operator*(const Mat4<T>& matrix, const Vec4<T>& vector)
-	{
-		return Vec4<T>(matrix(0, 0) * vector.x + matrix(1, 0) * vector.y + matrix(2, 0) * vector.z + matrix(3, 0) * vector.w,
-					   matrix(0, 1) * vector.x + matrix(1, 1) * vector.y + matrix(2, 1) * vector.z + matrix(3, 1) * vector.w,
-					   matrix(0, 2) * vector.x + matrix(1, 2) * vector.y + matrix(2, 2) * vector.z + matrix(3, 2) * vector.w,
-					   matrix(0, 3) * vector.x + matrix(1, 3) * vector.y + matrix(2, 3) * vector.z + matrix(3, 3) * vector.w);
-	}
-
-	template <typename T>
-	Mat4<T> operator*(const Mat4<T>& matrix, const T scalar)
-	{
-		Mat4<T> matrixCopy = matrix;
-		return matrixCopy *= scalar;
-	}
-
-	template<typename T>
-	Mat4<T> operator*(const T scalar, const Mat4<T>& matrix)
-	{
-		Mat4<T> matrixCopy = matrix;
-		return matrixCopy *= scalar;
-	}
-
-	template <typename T>
-	std::ostream& operator<<(std::ostream& stream, const Mat4<T>& matrix)
-	{
-		stream << "( " << matrix(0, 0) << ", " << matrix(0, 1) << ", " << matrix(0, 2) << ", " << matrix(0, 3) << std::endl;
-		stream << "  " << matrix(1, 0) << ", " << matrix(1, 1) << ", " << matrix(1, 2) << ", " << matrix(1, 3) << std::endl;
-		stream << "  " << matrix(2, 0) << ", " << matrix(2, 1) << ", " << matrix(2, 2) << ", " << matrix(2, 3) << std::endl;
-		stream << "  " << matrix(3, 0) << ", " << matrix(3, 1) << ", " << matrix(3, 2) << ", " << matrix(3, 3) << " )";
-		return stream;
-	}
-
-	template <typename T>
-	void Mat4<T>::InitializeClassWithSol(const std::shared_ptr<sol::state>& luaState)
-	{
-		luaState->new_usertype<Mat4>
-		(
-			// Name of Mat4
-			"Mat4",
-
-			"GetValueAtIndex", &Mat4::GetValueAtIndex,
-			"SetValueAtIndex", &Mat4::SetValueAtIndex,
-
-			"new", sol::constructors<
-				Mat4(T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T), 
-				Mat4(const Vec4<T>&, const Vec4<T>&, const Vec4<T>&, const Vec4<T>&),
-				Mat4(T),
-				Mat4(const Mat4&)
-			>(),
-
-			sol::meta_function::to_string, &Mat4::ToString,
-
-			sol::meta_function::multiplication, sol::overload(
-				sol::resolve<Mat4(const Mat4&)>(&Mat4::Multiply), 
-				sol::resolve<Mat4(const Mat3<T>&)>(&Mat4::Multiply),
-				sol::resolve<Mat4(T)>(&Mat4::Multiply)),
-
-			"GetInverse",			&Mat4::GetInverse,
-			"Inverse",				&Mat4::Inverse,
-			"GetTranspose",			&Mat4::GetTranspose,
-			"Transpose",			&Mat4::Transpose,
-			"GetDeterminant",		&Mat4::GetDeterminant,
-			"GetColumn",			&Mat4::GetColumn,
-			"SetColumn",			&Mat4::SetColumn,
-			"GetRow",				&Mat4::GetRow,
-			"SetRow",				&Mat4::SetRow,
-			"GetTranslation",		&Mat4::GetTranslation,
-			"SetTranslation",		&Mat4::SetTranslation,
-			//"GetScale",				&Mat4::GetScale,
-			"GetAffineMatrix",		&Mat4::GetAffineMatrix,
-			"GetNormalMatrix",		&Mat4::GetNormalMatrix,
-			"GetRotationMatrix",	&Mat4::GetRotationMatrix,
-			"GetValuePointer",		&Mat4::GetValuePointer
-		);
-
-		luaState->set_function("MakeRotationX",		&Mat4::MakeRotationX);
-		luaState->set_function("MakeRotationY",		&Mat4::MakeRotationY);
-		luaState->set_function("MakeRotationZ",		&Mat4::MakeRotationZ);
-		luaState->set_function("MakeRotation",		&Mat4::MakeRotation);
-
-		luaState->set_function("MakeScale", sol::overload(
-				sol::resolve<Mat4(T)>(&Mat4::MakeScale),
-				sol::resolve<Mat4(T, T, T)>(&Mat4::MakeScale),
-				sol::resolve<Mat4(const Vec3<T>&)>(&Mat4::MakeScale)));
-
-		luaState->set_function("MakeTranslation", sol::overload(
-				sol::resolve<Mat4(T)>(&Mat4::MakeTranslation),
-				sol::resolve<Mat4(T, T, T)>(&Mat4::MakeTranslation),
-				sol::resolve<Mat4(const Vec3<T>&)>(&Mat4::MakeTranslation)));
-
-		luaState->set_function("LookAt",				&Mat4::LookAt);
-		luaState->set_function("Orthographic",		&Mat4::Orthographic);
-		luaState->set_function("Perspective",		&Mat4::Perspective);
-		luaState->set_function("Identity",			&Mat4::Identity);
-	}
-
-	template <typename T>
-	T Mat4<T>::GetValueAtIndex(int i, int j)
-	{
-		return data[i][j];
-	}
-
-	template <typename T>
-	void Mat4<T>::SetValueAtIndex(int i, int j, T value)
-	{
-		data[i][j] = value;
-	}
-
-	template <typename T>
-	Mat4<T> Mat4<T>::Multiply(const Mat4& matrix)
-	{
-		return *this * matrix;
-	}
-
-	template <typename T>
-	Mat4<T> Mat4<T>::Multiply(const Mat3<T>& matrix)
-	{
-		return *this * matrix;
-	}
-
-	template <typename T>
-	Mat4<T> Mat4<T>::Multiply(T scalar)
-	{
-		return *this * scalar;
 	}
 }

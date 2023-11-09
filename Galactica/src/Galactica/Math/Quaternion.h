@@ -1,9 +1,10 @@
-#pragma once
+﻿#pragma once
 
-#include "Vec4.h"
+#include  "Vec3.h"
+#include  "Vec4.h"
 #include "Mat3.h"
 
-namespace Galactica::Math
+namespace Galactica
 {
 	template <typename T>
 	class Quaternion
@@ -30,6 +31,7 @@ namespace Galactica::Math
 		T SqrNorm() const;
 		Quaternion<T> GetNormalize() const;
 		Quaternion<T>& Normalize();
+		static Quaternion Normalize(const Quaternion& quat);
 		Quaternion<T> GetRenormalize() const;
 		Quaternion<T>& Renormalize();
 		Quaternion<T> GetInverse() const;
@@ -51,8 +53,11 @@ namespace Galactica::Math
 		static Quaternion<T> Nlerp(const Quaternion<T>& leftQuaternion, const Quaternion<T>& rightQuaternion, const T t);
 		static Quaternion<T> Slerp(const Quaternion<T>& leftQuaternion, const Quaternion<T>& rightQuaternion, const T t);
 
+		static T LengthSquared(const Quaternion& quat);
+		static T Length(const Quaternion& quat);
+
 		Quaternion<T>& operator=(const Quaternion<T>& quaternion);
-		Quaternion<T>& operator*=(const Quaternion<T>& quaterion);
+		Quaternion<T>& operator*=(const Quaternion<T>& quaternion);
 		Quaternion<T>& operator*=(const T scalar);
 		Quaternion<T>& operator/=(const T scalar);
 		Quaternion<T>& operator+=(const Quaternion<T>& quaternion);
@@ -63,16 +68,14 @@ namespace Galactica::Math
 			return Quaternion<T>::TransformVector(quaternion, vector);
 		}
 
-		static void InitializeClassWithSol(const std::shared_ptr<sol::state>& luaState);
 
 	private:
-		const std::string ToString() const;
 
-		Quaternion Add(const Quaternion& quat);
+		Quaternion Add(const Quaternion& quaternion);
 
-		Quaternion Subtract(const Quaternion& quat);
+		Quaternion Subtract(const Quaternion& quaternion);
 
-		Quaternion Multiply(const Quaternion& quat);
+		Quaternion Multiply(const Quaternion& quaternion);
 
 		Quaternion Multiply(T scalar);
 
@@ -80,30 +83,30 @@ namespace Galactica::Math
 	};
 
 	template <typename T>
-	Quaternion<T> operator*(const Quaternion<T>& leftQuaterion, const Quaternion<T>& rightQuaterion);
+	Quaternion<T> operator*(const Quaternion<T>& leftQuaternion, const Quaternion<T>& rightQuaternion);
 
 	template <typename T>
-	Quaternion<T> operator*(const Quaternion<T>& quaterion, const T scalar);
+	Quaternion<T> operator*(const Quaternion<T>& quaternion, T scalar);
 
 	template <typename T>
-	Quaternion<T> operator*(const T scalar, const Quaternion<T>& quaterion);
+	Quaternion<T> operator*(T scalar, const Quaternion<T>& quaternion);
 
 	template <typename T>
-	Quaternion<T> operator/(const Quaternion<T>& quaterion, const T scalar);
+	Quaternion<T> operator/(const Quaternion<T>& quaternion, const T scalar);
 
 	template <typename T>
-	Quaternion<T> operator/(const T scalar, const Quaternion<T>& quaterion);
+	Quaternion<T> operator/(const T scalar, const Quaternion<T>& quaternion);
 
 	template <typename T>
-	Quaternion<T> operator+(const Quaternion<T>& leftQuaterion, const Quaternion<T>& rightQuaterion);
+	Quaternion<T> operator+(const Quaternion<T>& leftQuaternion, const Quaternion<T>& rightQuaternion);
 
 	template <typename T>
-	Quaternion<T> operator-(const Quaternion<T>& leftQuaterion, const Quaternion<T>& rightQuaterion);
+	Quaternion<T> operator-(const Quaternion<T>& leftQuaternion, const Quaternion<T>& rightQuaternion);
 
-	template <typename T>
-	std::ostream& operator<<(std::ostream& stream, const Quaternion<T>& quaternion);
+	// template <typename T>
+	// std::ostream& operator<<(std::ostream& stream, const Quaternion<T>& quaternion);
 
-	using QuatF = Quaternion<float>;
+	using QuatFloat = Quaternion<float>;
 }
 
 #include "Quaternion.inl"

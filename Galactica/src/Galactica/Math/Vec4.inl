@@ -1,179 +1,52 @@
-#pragma once
+﻿#pragma once
 
-#include <cassert>
-#include <cmath>
-#include <string>
-#include "MathFunctions.h"
 #include "Vec4.h"
 
-namespace Galactica::Math
+namespace Galactica
 {
 	template <typename T>
-	Vec4<T>::Vec4()
-		: x(0), y(0), z(0), w(0)
+	constexpr Vec4<T>::Vec4() noexcept
+		: x(static_cast<T>(0)), y(static_cast<T>(0)), z(static_cast<T>(0), w(static_cast<T>(0)))
 	{
 	}
 
 	template <typename T>
-	Vec4<T>::Vec4(const Vec4<T>& vector)
-		: x(vector.x), y(vector.y), z(vector.z), w(vector.w)
-	{
-	}
-
-	template<typename T>
-	Vec4<T>::Vec4(std::initializer_list<T> args)
-	{
-		int index = 0;
-		for (auto begin = args.begin(); begin != args.end(); ++begin)
-		{
-			this->data.at(index++) = *begin;
-		}
-	}
-
-	template <typename T>
-	Vec4<T>::Vec4(const T x, const T y, const T z, const T w)
+	constexpr Vec4<T>::Vec4(T x, T y, T z, T w) noexcept
 		: x(x), y(y), z(z), w(w)
 	{
 	}
 
 	template <typename T>
-	Vec4<T>::Vec4(const T x, const T y, const T z)
-		: x(x), y(y), z(z), w(0)
+	constexpr Vec4<T>::Vec4(T value) noexcept
+		: x(value), y(value), z(value), w(value)
 	{
 	}
 
 	template <typename T>
-	Vec4<T>::Vec4(const T scalar)
-		: x(scalar), y(scalar), z(scalar), w(scalar)
+	constexpr Vec4<T>::Vec4(std::initializer_list<T> data) noexcept
+	{
+		GL_CORE_ASSERT(data.size() == 4, "Initializer List needs 4 arguments!");
+		std::copy(data.begin(), data.end(), variables.begin());
+	}
+
+	template <typename T>
+	constexpr Vec4<T>::Vec4(const Vec4& vector)
+		: x(vector.x), y(vector.y), z(vector.z), w(vector.w)
 	{
 	}
 
 	template <typename T>
-	T Vec4<T>::Magnitude() const
+	constexpr Vec4<T>::Vec4(const Vec3<T>& vector, T value)
 	{
-		return std::sqrt(SqrMagnitude());
+		this->x = vector.x;
+		this->y = vector.y;
+		this->z = vector.z;
+		this->w = value;
 	}
 
+	// Operations
 	template <typename T>
-	T Vec4<T>::SqrMagnitude() const
-	{
-		return x * x + y * y + z * z + w * w;
-	}
-
-	template <typename T>
-	Vec4<T> Vec4<T>::GetNormalize() const
-	{
-		assert(!NearEquals(Magnitude(), static_cast<T>(0)));
-
-		T magnitude = Magnitude();
-
-		return Vec4<T>(x / magnitude, y / magnitude, z / magnitude, w / magnitude);
-	}
-
-	template <typename T>
-	Vec4<T>& Vec4<T>::Normalize()
-	{
-		assert(!NearEquals(Magnitude(), static_cast<T>(0)));
-
-		*this /= Magnitude();
-
-		return *this;
-	}
-
-	template <typename T>
-	Vec4<T> Vec4<T>::GetRenormalize() const
-	{
-		T inverseMagnitude = FastInverseSquareRootAroundOne(SqrMagnitude());
-		return Vec4<T>(x * inverseMagnitude, y * inverseMagnitude, z * inverseMagnitude, w * inverseMagnitude);
-	}
-
-	template <typename T>
-	Vec4<T>& Vec4<T>::Renormalize()
-	{
-		T inverseMagnitude = FastInverseSquareRootAroundOne(SqrMagnitude());
-		return *this *= inverseMagnitude;
-	}
-
-	template <typename T>
-	Vec4<T> Vec4<T>::GetNegate() const
-	{
-		return *this * static_cast<T>(-1);
-	}
-
-	template <typename T>
-	Vec4<T>& Vec4<T>::Negate()
-	{
-		*this *= static_cast<T>(-1);
-		return *this;
-	}
-
-	template <typename T>
-	Vec4<T> Vec4<T>::GetAbsoluteValue()
-	{
-		Vec4<T> absoluteValueVector(std::abs(x), std::abs(y), std::abs(z), std::abs(w));
-
-		return absoluteValueVector;
-	}
-
-	template <typename T>
-	T Vec4<T>::GetLargestElement() const
-	{
-		float largest = x;
-
-		if (y > largest)
-		{
-			largest = y;
-		}
-
-		if (z > largest)
-		{
-			largest = z;
-		}
-
-		if (w > largest)
-		{
-			largest = w;
-		}
-
-		return largest;
-	}
-
-	template<typename T>
-	const T* Vec4<T>::GetValuePointer() const
-	{
-		return data.data();
-	}
-
-	template <typename T>
-	std::string Vec4<T>::ToString() const
-	{
-		std::string vectorString = "(" + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + ", " + std::to_string(w) + ")";
-		return vectorString;
-	}
-
-	template <typename T>
-	T Vec4<T>::Dot(const Vec4<T>& leftVector, const Vec4<T>& rightVector)
-	{
-		return leftVector.x * rightVector.x +
-			   leftVector.y * rightVector.y +
-			   leftVector.z * rightVector.z +
-			   leftVector.w * rightVector.w;
-	}
-
-	template <typename T>
-	Vec4<T> Vec4<T>::Lerp(const Vec4<T>& leftVector, const Vec4<T>& rightVector, const T t)
-	{
-		return leftVector * (static_cast<T>(1) - t) + rightVector * t;
-	}
-
-	template <typename T>
-	Vec4<T> Vec4<T>::Zero()
-	{
-		return Vec4<T>();
-	}
-
-	template <typename T>
-	Vec4<T>& Vec4<T>::operator=(const Vec4<T>& vector)
+	Vec4<T>& Vec4<T>::operator=(const Vec4& vector)
 	{
 		x = vector.x;
 		y = vector.y;
@@ -183,7 +56,14 @@ namespace Galactica::Math
 	}
 
 	template <typename T>
-	Vec4<T>& Vec4<T>::operator+=(const Vec4<T>& vector)
+	Vec4<T> Vec4<T>::operator+(const Vec4& vector)
+	{
+		GL_CORE_ASSERT(!vector.HasNaNs(), "Operation '/' failed, the vector has NaNs!");
+		return Vec4(x - vector.x, y - vector.y, z - vector.z, w - vector.w);
+	}
+
+	template <typename T>
+	Vec4<T>& Vec4<T>::operator+=(const Vec4& vector)
 	{
 		x += vector.x;
 		y += vector.y;
@@ -193,7 +73,14 @@ namespace Galactica::Math
 	}
 
 	template <typename T>
-	Vec4<T>& Vec4<T>::operator-=(const Vec4<T>& vector)
+	Vec4<T> Vec4<T>::operator-(const Vec4& vector)
+	{
+		GL_CORE_ASSERT(!vector.HasNaNs(), "Operation '/' failed, the vector has NaNs!");
+		return Vec4(x - vector.x, y - vector.y, z - vector.z, w - vector.w);
+	}
+
+	template <typename T>
+	Vec4<T>& Vec4<T>::operator-=(const Vec4& vector)
 	{
 		x -= vector.x;
 		y -= vector.y;
@@ -203,90 +90,153 @@ namespace Galactica::Math
 	}
 
 	template <typename T>
-	Vec4<T>& Vec4<T>::operator*=(const T scalar)
+	Vec4<T> Vec4<T>::operator*(T value)
 	{
-		x *= scalar;
-		y *= scalar;
-		z *= scalar;
-		w *= scalar;
+		GL_CORE_ASSERT(!std::isnan(value), "Operation '/' failed, the value is NaN!");
+		return Vec4(x * value, y * value, z * value, w * value);
+	}
+
+	template <typename T>
+	Vec4<T>& Vec4<T>::operator*=(T value)
+	{
+		x *= value;
+		y *= value;
+		z *= value;
+		w *= value;
 		return *this;
 	}
 
 	template <typename T>
-	Vec4<T>& Vec4<T>::operator/=(const T scalar)
+	Vec4<T> Vec4<T>::operator/(T value)
 	{
-		x /= scalar;
-		y /= scalar;
-		z /= scalar;
-		w /= scalar;
+		GL_CORE_ASSERT(value != 0, "[Division By Zero Error]: The result of operation '/' will be Infinite!");
+		float inverse = static_cast<float>(1) / value;
+		return Vec4(x * inverse, y * inverse, z * inverse, w * inverse);
+	}
+
+	template <typename T>
+	Vec4<T>& Vec4<T>::operator/=(T value)
+	{
+		GL_CORE_ASSERT(value != 0, "[Division By Zero Error]: The result of operation '/' will be Infinite!");
+		float inverse = static_cast<float>(1) / value;
+		x *= inverse;
+		y *= inverse;
+		z *= inverse;
+		w *= inverse;
 		return *this;
 	}
 
 	template <typename T>
-	void Vec4<T>::InitializeClassWithSol(const std::shared_ptr<sol::state>& luaState)
+	bool Vec4<T>::operator==(const Vec4& vector)
 	{
-		luaState->new_usertype<Vec4>(
-			// Class Name
-			"Vec4",
-
-			// Variables
-			"x", &Vec4::x,
-			"y", &Vec4::y,
-			"z", &Vec4::z,
-			"w", &Vec4::w,
-
-			"new", sol::constructors<
-				Vec4(), 
-				Vec4(T, T, T),
-				Vec4(T, T, T, T), 
-				Vec4(T)>(),
-
-			// Meta Functions for overloading and special functions
-			sol::meta_function::to_string,		&Vec4::ToString,
-			sol::meta_function::addition,		&Vec4::Add,
-			sol::meta_function::subtraction,	&Vec4::Subtract,
-			sol::meta_function::multiplication, &Vec4::Multiply,
-			sol::meta_function::division,		&Vec4::Divide,
-
-			// Supported Functions
-			"SquareMagnitude",	&Vec4::SqrMagnitude,
-			"Magnitude",		&Vec4::Magnitude,
-			"GetNormalize",		&Vec4::GetNormalize,
-			"Normalize",		&Vec4::Normalize,
-			"GetRenormalize",	&Vec4::GetRenormalize,
-			"Renormalize",		&Vec4::Renormalize,
-			"GetNegate",		&Vec4::GetNegate,
-			"Negate",			&Vec4::Negate,
-			"GetAbsoluteValue", &Vec4::GetAbsoluteValue
-		);
-
-		// Static Variables
-		luaState->set_function("Vec4Dot",	&Vec4::Dot);
-		luaState->set_function("Vec4Lerp",	&Vec4::Lerp);
-		luaState->set_function("Vec4Zero",	&Vec4::Zero);
+		GL_CORE_ASSERT(!vector.HasNaNs(), "Operation '/' failed, the vector has NaNs!");
+		return x == vector.x && y == vector.y && z == vector.z && w == vector.w;
 	}
 
 	template <typename T>
-	Vec4<T> Vec4<T>::Add(const Vec4& vector)
+	bool Vec4<T>::operator!=(const Vec4& vector)
 	{
-		return vector + (*this);
+		GL_CORE_ASSERT(!vector.HasNaNs(), "Operation '/' failed, the vector has NaNs!");
+		return x != vector.x || y != vector.y || z != vector.z || w != vector.w;
 	}
 
 	template <typename T>
-	Vec4<T> Vec4<T>::Subtract(const Vec4& vector)
+	const T* Vec4<T>::GetPointerToData() const
 	{
-		return vector - (*this);
+		return variables.data();
+	}
+
+	// Core Functions
+	template <typename T>
+	bool Vec4<T>::HasNaNs() const
+	{
+		return std::isnan(x) || std::isnan(y) || std::isnan(z) || std::isnan(w);
 	}
 
 	template <typename T>
-	Vec4<T> Vec4<T>::Multiply(T scalar)
+	bool Vec4<T>::HasInfinite() const
 	{
-		return (*this) * scalar;
+		return std::isinf(x) || std::isinf(y) || std::isinf(z) || std::isinf(w);
 	}
 
 	template <typename T>
-	Vec4<T> Vec4<T>::Divide(T scalar)
+	bool Vec4<T>::IsZero(const Vec4& vector)
 	{
-		return (*this) / scalar;
+		return vector.x == 0 && vector.y == 0 && vector.z == 0 && vector.w == 0;
+	}
+
+	template <typename T>
+	T Vec4<T>::LengthSqrd() const
+	{
+		return x * x + y * y + z * z + w * w;
+	}
+
+	template <typename T>
+	T Vec4<T>::Length() const
+	{
+		return std::sqrt(LengthSqrd());
+	}
+
+	template <typename T>
+	Vec4<T>& Vec4<T>::GetNormalize()
+	{
+		*this /= Length();
+		return *this;
+	}
+
+	template <typename T>
+	Vec4<T> Vec4<T>::Normalize(const Vec4& vector)
+	{
+		return Vec4(vector.x / vector.Length(), vector.y / vector.Length(), vector.z / vector.Length(), vector.w / vector.Length());
+	}
+
+	template <typename T>
+	T Vec4<T>::Dot(const Vec4& lhsVector, const Vec4& rhsVector)
+	{
+		return lhsVector.x * rhsVector.x + lhsVector.y * rhsVector.y + lhsVector.z * rhsVector.z + lhsVector.w * rhsVector.w;
+	}
+
+	template <typename T>
+	T Vec4<T>::AbsDot(const Vec4& lhsVector, const Vec4& rhsVector)
+	{
+		return std::abs(Dot(lhsVector, rhsVector));
+	}
+
+	template <typename T>
+	T Vec4<T>::MinComponent(const Vec4& vector)
+	{
+		return std::min<T>(vector.x, std::min<T>(vector.y, std::min<T>(vector.z, vector.w)));
+	}
+
+	template <typename T>
+	T Vec4<T>::MaxComponent(const Vec4& vector)
+	{
+		return std::max<T>(vector.x, std::max<T>(vector.y, std::max<T>(vector.z, vector.w)));
+	}
+
+	template <typename T>
+	Vec4<T> Vec4<T>::Min(const Vec4& lhsVector, const Vec4& rhsVector)
+	{
+		return Vec4(
+			std::min<T>(lhsVector.x, rhsVector.x),
+			std::min<T>(lhsVector.y, rhsVector.y),
+			std::min<T>(lhsVector.z, rhsVector.z),
+			std::min<T>(lhsVector.w, rhsVector.w));
+	}
+
+	template <typename T>
+	Vec4<T> Vec4<T>::Max(const Vec4& lhsVector, const Vec4& rhsVector)
+	{
+		return Vec4(
+			std::max<T>(lhsVector.x, rhsVector.x),
+			std::max<T>(lhsVector.y, rhsVector.y),
+			std::max<T>(lhsVector.z, rhsVector.z),
+			std::max<T>(lhsVector.w, rhsVector.w));
+	}
+
+	template <typename T>
+	Vec4<T> Vec4<T>::Permute(const Vec4& vector, int x, int y, int z, int w)
+	{
+		return Vec4(vector[x], vector[y], vector[z], vector[w]);
 	}
 }

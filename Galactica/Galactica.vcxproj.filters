@@ -1368,40 +1368,61 @@
     <ClInclude Include="src\Galactica\Logger\Logger.h">
       <Filter>src\Galactica\Logger</Filter>
     </ClInclude>
+    <ClInclude Include="src\Galactica\Math\Constants.h">
+      <Filter>src\Galactica\Math</Filter>
+    </ClInclude>
     <ClInclude Include="src\Galactica\Math\Mat3.h">
+      <Filter>src\Galactica\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Galactica\Math\Mat3.inl">
       <Filter>src\Galactica\Math</Filter>
     </ClInclude>
     <ClInclude Include="src\Galactica\Math\Mat4.h">
       <Filter>src\Galactica\Math</Filter>
     </ClInclude>
+    <ClInclude Include="src\Galactica\Math\Mat4.inl">
+      <Filter>src\Galactica\Math</Filter>
+    </ClInclude>
     <ClInclude Include="src\Galactica\Math\Math.h">
       <Filter>src\Galactica\Math</Filter>
     </ClInclude>
-    <ClInclude Include="src\Galactica\Math\MathConstants.h">
-      <Filter>src\Galactica\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Galactica\Math\MathFunctions.h">
+    <ClInclude Include="src\Galactica\Math\MathHelper.h">
       <Filter>src\Galactica\Math</Filter>
     </ClInclude>
     <ClInclude Include="src\Galactica\Math\Quaternion.h">
       <Filter>src\Galactica\Math</Filter>
     </ClInclude>
-    <ClInclude Include="src\Galactica\Math\Swizzle.h">
+    <ClInclude Include="src\Galactica\Math\Quaternion.inl">
+      <Filter>src\Galactica\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Galactica\Math\VQS.h">
       <Filter>src\Galactica\Math</Filter>
     </ClInclude>
     <ClInclude Include="src\Galactica\Math\Vec2.h">
       <Filter>src\Galactica\Math</Filter>
     </ClInclude>
+    <ClInclude Include="src\Galactica\Math\Vec2.inl">
+      <Filter>src\Galactica\Math</Filter>
+    </ClInclude>
     <ClInclude Include="src\Galactica\Math\Vec3.h">
       <Filter>src\Galactica\Math</Filter>
     </ClInclude>
+    <ClInclude Include="src\Galactica\Math\Vec3.inl">
+      <Filter>src\Galactica\Math</Filter>
+    </ClInclude>
     <ClInclude Include="src\Galactica\Math\Vec4.h">
+      <Filter>src\Galactica\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Galactica\Math\Vec4.inl">
       <Filter>src\Galactica\Math</Filter>
     </ClInclude>
     <ClInclude Include="src\Galactica\Renderer\Camera.h">
       <Filter>src\Galactica\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Galactica\Renderer\CameraControl.h">
+      <Filter>src\Galactica\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Galactica\Renderer\Line.h">
       <Filter>src\Galactica\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Galactica\Renderer\Mesh.h">
@@ -1454,7 +1475,13 @@
     <ClCompile Include="src\Galactica\Logger\Logger.cpp">
       <Filter>src\Galactica\Logger</Filter>
     </ClCompile>
+    <ClCompile Include="src\Galactica\Math\VQS.cpp">
+      <Filter>src\Galactica\Math</Filter>
+    </ClCompile>
     <ClCompile Include="src\Galactica\Renderer\CameraControl.cpp">
+      <Filter>src\Galactica\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Galactica\Renderer\Line.cpp">
       <Filter>src\Galactica\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Galactica\Renderer\Mesh.cpp">

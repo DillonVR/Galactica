@@ -34,6 +34,7 @@ project "Galactica"
 
 	files{
 		"%{prj.name}/src/**.h",
+		"%{prj.name}/src/**.inl",
 		"%{prj.name}/src/**.cpp",
 		"%{prj.name}/Vendor/stb_image/**.h",
 		"%{prj.name}/Vendor/stb_image/**.cpp",

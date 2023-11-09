@@ -12,6 +12,7 @@
 		:	Layer("Example"),
 			AnimationShader("Shaders/animationShader.vert", "Shaders/animationShader.frag"),
 			ModelShader("Shaders/modelShader.vert", "Shaders/modelShader.frag"),
+			LineShader("Shaders/lineShader.vert", "Shaders/lineShader.frag"),
 			camera(45.0f, 1, 0.1f, 1000)
 	{
 		int size = 10;
@@ -20,7 +21,7 @@
 		for (int i = 0; i < size; ++i) {
 			for (int j = 0; j < size; ++j) {
 				// create 4 vertices for each quad
-				Galactica::Vertex v1, v2, v3, v4;
+				Galactica::Vertex v1, v2, v3, v4, v5, v6, v7, v8;
 
 				v1.Position = glm::vec3(i, 0, j);
 				v2.Position = glm::vec3(i + 1, 0, j);
@@ -32,7 +33,7 @@
 				vertices.push_back(v3);
 				vertices.push_back(v4);
 
-				// create indices
+				// // create indices
 				int start = (i * size + j) * 4;
 				indices.push_back(start);
 				indices.push_back(start + 1);
@@ -43,27 +44,23 @@
 			}
 		}
 
-		// Galactica::Texture texture;
-		// texture.id = 0;
-		// texture.path = "assets/Materials/Floor.jpg";
-		// textures.push_back(texture);
-
 		//int floor mesh
-		floormesh.lineMesh(vertices, indices);
-		
+		floormesh.lineMesh(vertices,indices);
 
 		//load the models
-		ourModel.LoadModel("assets/Paladin/Paladin.dae", false);
-		backpackModel.LoadModel("assets/backpack/backpack.obj", false);
-
-		skelly = ourModel.GetBoneLines();
-
-		//bones.lineMesh(skelly.data(),skelly.data()->end)
-		
+		GL_LOGGER_INFO("----------------------Loading model--------------------");
+		GL_LOGGER_INFO("Loading model Solider");
+		ourModel.LoadModel("assets/Soldier/Soldier.dae", false);
+		// GL_LOGGER_INFO("Loading model Bag");
+		// backpackModel.LoadModel("assets/backpack/backpack.obj", false);
+		GL_LOGGER_INFO("Loading model done");
 		//load the animations
+		GL_LOGGER_INFO("---------------------Animations----------------------");
+		GL_LOGGER_INFO("Loading Dancing Animation");
 		animation.LoadAnimation("assets/Animations/SillyDancing.dae", &ourModel);
+		GL_LOGGER_INFO("Loading Walking animation");
 		Walking.LoadAnimation("assets/Animations/Walking.dae", &ourModel);
-		// dWalk.LoadAnimation("assets/Animations/Drunk Walk.dae", &ourModel);
+		GL_LOGGER_INFO("Loading Strafe");
 		strafe.LoadAnimation("assets/Animations/Strafe.dae", &ourModel);
 
 		animator.Play(&Walking);
@@ -77,7 +74,7 @@
 
 		const glm::mat4 projection = camera.GetViewProjection();
 
-		//animation draw
+		//-----------------Animation draw-----------------//
 		
 		AnimationShader.Use();
 		AnimationShader.setMat4("projectionView", projection);
@@ -92,27 +89,30 @@
 		for (int i = 0; i < transforms.size(); ++i)
 			AnimationShader.setMat4("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
 
+		//skin model
 		if (showSkin)
 		{
 			ourModel.DrawModel(AnimationShader);
 		}
 
+		//-----------------Bones draw-----------------//
+		if (showBones)
+		{
+			LineShader.Use();
+			LineShader.setMat4("projection", projection);
+			bones.SetLine(animator.debugBone);
+			auto debugBone = glm::mat4(1.0f);
 
-		//model draw
+			debugBone = glm::scale(debugBone, glm::vec3(1.0f, 1.0f, 1.0f));
+			LineShader.setMat4("model", debugBone);
+
+			bones.DrawLine(LineShader);
+		}
+
+		//-----------------Floor draw-----------------//
 		ModelShader.Use();
-
 		ModelShader.setMat4("projection", projection);
 
-		auto Backpack = glm::mat4(1.0f);
-		Backpack = glm::translate(Backpack, glm::vec3(3.0f, 1.0f, 0.0f));
-		Backpack = glm::scale(Backpack, glm::vec3(0.2f, 0.2f, 0.2f));
-
-		ModelShader.setMat4("model", Backpack);
-
-		backpackModel.DrawModel(ModelShader);
-
-		//Draw floor
-		floormesh.DebugMode(true);
 		float angleInDegrees = 180.0f;
 		float angleInRadians = glm::radians(angleInDegrees);
 
@@ -120,14 +120,24 @@
 		floor = glm::translate(floor, glm::vec3(-10.0f, 0.0f, 20.0f));
 		floor = glm::scale(floor, glm::vec3(3.0f, 1.0f, 3.0f));
 		floor = glm::rotate(floor, angleInRadians, glm::vec3(1.0f, 0.0f, 0.0f));
+		float floorColor = 1.0f;
 
+		floormesh.DebugMode(true);
 		ModelShader.setMat4("model", floor);
-
 		floormesh.DrawMesh(ModelShader);
 
-		if (!debugMode)
-			floormesh.DebugMode(false);
-		
+		//Draw debug
+
+		floormesh.DebugMode(debugMode);
+		//-----------------bag draw-----------------//
+
+		// auto Backpack = glm::mat4(1.0f);
+		// Backpack = glm::translate(Backpack, glm::vec3(3.0f, 1.0f, 0.0f));
+		// Backpack = glm::scale(Backpack, glm::vec3(0.5f, 0.5f, 0.5f));
+		//
+		// ModelShader.setMat4("model", Backpack);
+		//
+		// backpackModel.DrawModel(ModelShader);
 	}
 
 	void AnimationLayer::OnImGuiRender()

@@ -1,5 +1,6 @@
 #pragma once
 #include "Animation.h"
+#include "Galactica/Math/VQS.h"
 
 namespace Galactica
 {
@@ -14,7 +15,11 @@ namespace Galactica
 
 		void CalcBoneTransformation(const AssimpNodeData* node, glm::mat4 parentTransform);
 
+		void CalcBoneTransformationVQS(const AssimpNodeData* node, VQS parentTransform);
+
 		std::vector<glm::mat4> GetFinalBoneMatrices();
+
+		std::vector<glm::vec3> debugBone;
 
 	private:
 

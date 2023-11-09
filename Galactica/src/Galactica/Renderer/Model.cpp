@@ -9,12 +9,12 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 
+#include "Galactica/Animation/Animator.h"
 #include "Galactica/Animation/AssimpToGLM.h"
-
 
 namespace Galactica
 {
-
+    
 	void Model::DrawModel(Shader& shader)
 	{
 		for (unsigned int i = 0; i < meshes.size(); i++)
@@ -25,7 +25,8 @@ namespace Galactica
     void Model::LoadModel(std::string const& path, bool gamma)
 	{
 		Assimp::Importer importer;
-        //BoneLine skelly{};
+        //Animator::debugBone.resize(MAX_BONE);
+        GL_LOGGER_INFO("Assimp : Reading file");
 		const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
 		
 		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) 
@@ -35,9 +36,11 @@ namespace Galactica
 		}
 		
 		directory = path.substr(0, path.find_last_of('/'));
+        GL_LOGGER_INFO("Assimp : Reading Done");
 
+        GL_LOGGER_INFO("Assimp :Processing Node");
 		processNode(scene->mRootNode, scene);
-        //Bonelines(scene->mRootNode, skelly);
+        GL_LOGGER_INFO("Assimp :Processing Node Done");
 	}
 
     //Setter for the vertex bone data
@@ -59,6 +62,8 @@ namespace Galactica
     {
         auto& boneInfoMap = boneMap;
         int& boneCount = boneNum;
+
+        GL_LOGGER_INFO("Assimp :Extracking Bone");
 
         for (int boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex)
         {
@@ -90,6 +95,7 @@ namespace Galactica
                 SetVertexBoneData(vertices[vertexId], boneID, weight);
             }
         }
+        GL_LOGGER_INFO("Assimp : Bone Extracting Done");
     }
     //Defalaut Bone data
     void Model::SetVertextBoneDataDefault(Vertex& vertex)
@@ -105,16 +111,17 @@ namespace Galactica
     // and after we've processed all of the meshes we then recursively process each of the children nodes
 	void Model::processNode(aiNode* node, const aiScene* scene)
 	{
-		
 		for (unsigned int i = 0; i < node->mNumMeshes; i++)
 		{
 			aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
 			meshes.push_back(processMesh(mesh, scene));
+            GL_LOGGER_INFO("Assimp :Processing Node -> Mesh");
 		}
 		
 		for (unsigned int i = 0; i < node->mNumChildren; i++)
 		{
 			processNode(node->mChildren[i], scene);
+            GL_LOGGER_INFO("Assimp :Processing chilren Node " + std::to_string(i)+ "/" + std::to_string(node->mNumChildren - 1));
 		}
 	}
 
@@ -124,6 +131,8 @@ namespace Galactica
         std::vector<Vertex> vertices;
         std::vector<unsigned int> indices;
         std::vector<Texture> textures;
+
+        GL_LOGGER_INFO("Assimp :Processing Mesh");
 
         for (unsigned int i = 0; i < mesh->mNumVertices; i++)
         {
@@ -196,6 +205,7 @@ namespace Galactica
         textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 
         ExtractBoneWeightForVertices(vertices, mesh, scene);
+        GL_LOGGER_INFO("Assimp :Processing Mesh Done");
 
         return Mesh(vertices, indices, textures);
 	}

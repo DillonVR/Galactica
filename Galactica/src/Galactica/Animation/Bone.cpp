@@ -3,6 +3,7 @@
 #include "Bone.h"
 #include "AssimpToGLM.h"
 #include "assimp/vector3.h"
+#include "Galactica/Math/MathHelper.h"
 
 #include "Galactica/Vendor/glm/glm/gtx/transform.hpp"
 
@@ -33,7 +34,7 @@ namespace Galactica
 			aiQuaternion aiOrientation = channel->mRotationKeys[rotationIndex].mValue;
 			float timeStamp = channel->mRotationKeys[rotationIndex].mTime;
 			KeyRotation data;
-			data.orientation = AssimpToGLMH::GetGLMQuat(aiOrientation);
+			data.orientation = AssimpInternalMathHelper::ConvertQuaternionToInternal(aiOrientation);
 			data.timeStamp = timeStamp;
 			rotations.push_back(data);
 		}
@@ -52,15 +53,22 @@ namespace Galactica
 
 	void Bone::Update(float animationTime)
 	{
-		glm::mat4 translation = InterpolatePos(animationTime);
-		glm::mat4 rotation = InterpolateRot(animationTime);
-		glm::mat4 scale = InterpolateScale(animationTime);
-		localTransform = translation * rotation * scale;
+		glm::mat4 translation = InterpolateVQSPos(animationTime);
+		glm::mat4 rotation = InterpolateVQSRot(animationTime);
+		glm::mat4 scale = InterpolateVQSScale(animationTime);
+		auto result = translation * rotation * scale;
+
+		localVQS = GLMInternalHelper::ConvertGLMMatrixToVQS(result);
 	}
 
 	glm::mat4 Bone::getLocalTransform()
 	{
 		return localTransform;
+	}
+
+	const VQS& Bone::GetLocalVQS() const
+	{
+		return localVQS;
 	}
 
 	std::string Bone::GetBoneName() const
@@ -73,31 +81,34 @@ namespace Galactica
 		return ID;
 	}
 
-	int Bone::GetPosIndex(float animationTime)
+	int Bone::GetPosIndex(float animationTime) const
 	{
 		for (int index = 0; index < numPositions - 1; ++index)
 		{
 			if (animationTime < positions[index + 1].timeStamp)
 				return index;
 		}
+		return 0;
 	}
 
-	int Bone::GetRotIndex(float animationTime)
+	int Bone::GetRotIndex(float animationTime) const
 	{
 		for (int index = 0; index < numRotations - 1; ++index)
 		{
 			if (animationTime < rotations[index + 1].timeStamp)
 				return index;
 		}
+		return 0;
 	}
 
-	int Bone::GetScaleIndex(float animationTime)
+	int Bone::GetScaleIndex(float animationTime) const
 	{
 		for (int index = 0; index < numScalings - 1; ++index)
 		{
 			if (animationTime < scales[index + 1].timeStamp)
 				return index;
 		}
+		return 0;
 	}
 
 	float Bone::GetScaleFactor(float lastTimeStamp, float nextTimeStamp, float animationTime)
@@ -110,53 +121,224 @@ namespace Galactica
 		return scaleFactor;
 	}
 
-	glm::mat4 Bone::InterpolatePos(float animationTime)
+	glm::mat4 Bone::InterpolateVQSPos(float animationTime)
 	{
-		if (1 == numPositions)
-			return glm::translate(glm::mat4(1.0f), positions[0].position);
+		const int firstPositionIndex = GetPosIndex(animationTime);
+		const int secondPositionIndex = firstPositionIndex + 1;
 
-		int p0Index = GetPosIndex(animationTime);
-		int p1Index = p0Index + 1;
+		const auto positionScaleFactor = GetScaleFactor(
+			positions[firstPositionIndex].timeStamp,
+			positions[secondPositionIndex].timeStamp,
+			animationTime);
 
-		float scaleFactor = GetScaleFactor(positions[p0Index].timeStamp,positions[p1Index].timeStamp, animationTime);
-
-		glm::vec3 finalPosition = glm::mix(positions[p0Index].position,positions[p1Index].position, scaleFactor);
-
-		return glm::translate(glm::mat4(1.0f), finalPosition);
-	}
-
-	glm::mat4 Bone::InterpolateRot(float animationTime)
-	{
-		if (1 == numRotations)
+		glm::mat4 translationMatrix;
+		if (numPositions == 1)
 		{
-			auto rotation = glm::normalize(rotations[0].orientation);
-			return glm::toMat4(rotation);
+			translationMatrix = glm::translate(glm::mat4(1.0f), positions[0].position);
+		}
+		else
+		{
+			const auto positionOne = GLMInternalHelper::ConvertGLMVectorToInternal(positions[firstPositionIndex].position);
+			const auto positionTwo = GLMInternalHelper::ConvertGLMVectorToInternal(positions[secondPositionIndex].position);
+
+			const auto finalPosition = GLMInternalHelper::ConvertInternalVectorToGLM(
+				Vec3f::Lerp(
+					positionOne,
+					positionTwo,
+					positionScaleFactor));
+
+			translationMatrix = glm::translate(glm::mat4(1.0f), finalPosition);
 		}
 
-		int p0Index = GetRotIndex(animationTime);
-		int p1Index = p0Index + 1;
-
-		float scaleFactor = GetScaleFactor(rotations[p0Index].timeStamp,rotations[p1Index].timeStamp, animationTime);
-
-		glm::quat finalRotation = glm::slerp(rotations[p0Index].orientation,rotations[p1Index].orientation, scaleFactor);
-
-		finalRotation = glm::normalize(finalRotation);
-
-		return glm::toMat4(finalRotation);
+		return translationMatrix;
 	}
 
-	glm::mat4 Bone::InterpolateScale(float animationTime)
+	glm::mat4 Bone::InterpolateVQSRot(float animationTime)
 	{
-		if (1 == numScalings)
-			return glm::scale(glm::mat4(1.0f), scales[0].scale);
+		const int firstRotationIndex = GetRotIndex(animationTime);
+		const int secondRotationIndex = firstRotationIndex + 1;
 
-		int p0Index = GetScaleIndex(animationTime);
-		int p1Index = p0Index + 1;
+		const auto rotationScaleFactor = GetScaleFactor(
+			rotations[firstRotationIndex].timeStamp,
+			rotations[secondRotationIndex].timeStamp,
+			animationTime);
 
-		float scaleFactor = GetScaleFactor(scales[p0Index].timeStamp,scales[p1Index].timeStamp, animationTime);
+		glm::mat4 rotationMatrix;
+		if (numRotations == 1)
+		{
+			const auto rotation = QuatFloat::Normalize(rotations[0].orientation);
+			rotationMatrix = GLMInternalHelper::ConvertQuaternionToGLMMatrix(rotation);
+		}
+		else
+		{
+			QuatFloat first = rotations[firstRotationIndex].orientation;
+			first = first.Normalize();
+			QuatFloat last = rotations[secondRotationIndex].orientation;
+			last = last.Normalize();
+			QuatFloat finalRotation = QuatFloat::Slerp(
+				first, last, rotationScaleFactor);
+			finalRotation = (finalRotation).Normalize();
 
-		glm::vec3 finalScale = glm::mix(scales[p0Index].scale, scales[p1Index].scale, scaleFactor);
+			rotationMatrix = GLMInternalHelper::ConvertQuaternionToGLMMatrix(finalRotation);
+		}
 
-		return glm::scale(glm::mat4(1.0f), finalScale);
+		return rotationMatrix;
+	}
+
+	glm::mat4 Bone::InterpolateVQSScale(float animationTime)
+	{
+		const int firstScalingIndex = GetScaleIndex(animationTime);
+		const int secondScalingIndex = firstScalingIndex + 1;
+
+		const auto scaleFactor = GetScaleFactor(scales[firstScalingIndex].timeStamp, scales[secondScalingIndex].timeStamp, animationTime);
+
+		glm::mat4 scalingMatrix;
+		if (numScalings == 1)
+		{
+			scalingMatrix = glm::scale(glm::mat4(1.0f), scales[0].scale);
+		}
+		else
+		{
+			const auto scaleOne = scales[firstScalingIndex].scale.x;
+			const auto scaleTwo = scales[secondScalingIndex].scale.x;
+			const auto finalScale = std::pow(scaleOne / scaleTwo, scaleFactor) * scaleOne;
+
+			scalingMatrix = glm::scale(glm::mat4(1.0f), { finalScale, finalScale, finalScale });
+		}
+
+		return scalingMatrix;
+	}
+
+	// glm::mat4 Bone::InterpolatePos(float animationTime)
+	// {
+	// 	if (1 == numPositions)
+	// 		return glm::translate(glm::mat4(1.0f), positions[0].position);
+	//
+	// 	int p0Index = GetPosIndex(animationTime);
+	// 	int p1Index = p0Index + 1;
+	//
+	// 	float scaleFactor = GetScaleFactor(positions[p0Index].timeStamp,positions[p1Index].timeStamp, animationTime);
+	//
+	// 	glm::vec3 finalPosition = glm::mix(positions[p0Index].position,positions[p1Index].position, scaleFactor);
+	//
+	// 	return glm::translate(glm::mat4(1.0f), finalPosition);
+	// }
+	//
+	// glm::mat4 Bone::InterpolateRot(float animationTime)
+	// {
+	// 	if (1 == numRotations)
+	// 	{
+	// 		auto rotation = glm::normalize(rotations[0].orientation);
+	// 		return glm::toMat4(rotation);
+	// 	}
+	//
+	// 	int p0Index = GetRotIndex(animationTime);
+	// 	int p1Index = p0Index + 1;
+	//
+	// 	float scaleFactor = GetScaleFactor(rotations[p0Index].timeStamp,rotations[p1Index].timeStamp, animationTime);
+	//
+	// 	glm::quat finalRotation = glm::slerp(rotations[p0Index].orientation,rotations[p1Index].orientation, scaleFactor);
+	//
+	// 	finalRotation = glm::normalize(finalRotation);
+	//
+	// 	return glm::toMat4(finalRotation);
+	// }
+	//
+	// glm::mat4 Bone::InterpolateScale(float animationTime)
+	// {
+	// 	if (1 == numScalings)
+	// 		return glm::scale(glm::mat4(1.0f), scales[0].scale);
+	//
+	// 	int p0Index = GetScaleIndex(animationTime);
+	// 	int p1Index = p0Index + 1;
+	//
+	// 	float scaleFactor = GetScaleFactor(scales[p0Index].timeStamp,scales[p1Index].timeStamp, animationTime);
+	//
+	// 	glm::vec3 finalScale = glm::mix(scales[p0Index].scale, scales[p1Index].scale, scaleFactor);
+	//
+	// 	return glm::scale(glm::mat4(1.0f), finalScale);
+	// }
+
+	VQS Bone::InterpolateWithVQS(float animationTime) const
+	{
+		// TRANSLATION
+		const int firstPositionIndex = GetPosIndex(animationTime);
+		const int secondPositionIndex = firstPositionIndex + 1;
+
+		const auto positionScaleFactor = GetScaleFactor(
+			positions[firstPositionIndex].timeStamp,
+			positions[secondPositionIndex].timeStamp,
+			animationTime);
+
+		glm::mat4 translationMatrix;
+		if (numPositions == 1)
+		{
+			translationMatrix = glm::translate(glm::mat4(1.0f), positions[0].position);
+		}
+		else
+		{
+			const auto positionOne = GLMInternalHelper::ConvertGLMVectorToInternal(positions[firstPositionIndex].position);
+			const auto positionTwo = GLMInternalHelper::ConvertGLMVectorToInternal(positions[secondPositionIndex].position);
+
+			const auto finalPosition = GLMInternalHelper::ConvertInternalVectorToGLM(
+				Vec3f::Lerp(
+					positionOne,
+					positionTwo,
+					positionScaleFactor));
+
+			translationMatrix = glm::translate(glm::mat4(1.0f), finalPosition);
+		}
+
+		// ROTATION
+		const int firstRotationIndex = GetRotIndex(animationTime);
+		const int secondRotationIndex = firstRotationIndex + 1;
+
+		const auto rotationScaleFactor = GetScaleFactor(
+			rotations[firstRotationIndex].timeStamp,
+			rotations[secondRotationIndex].timeStamp,
+			animationTime);
+
+		glm::mat4 rotationMatrix;
+		if (numRotations == 1)
+		{
+			const auto rotation = QuatFloat::Normalize(rotations[0].orientation);
+			rotationMatrix = GLMInternalHelper::ConvertQuaternionToGLMMatrix(rotation);
+		}
+		else
+		{
+			QuatFloat first = rotations[firstRotationIndex].orientation;
+			first = first.Normalize();
+			QuatFloat last = rotations[secondRotationIndex].orientation;
+			last = last.Normalize();
+			QuatFloat finalRotation = QuatFloat::Slerp(
+				first,last,rotationScaleFactor);
+			finalRotation = (finalRotation).Normalize();
+
+			rotationMatrix = GLMInternalHelper::ConvertQuaternionToGLMMatrix(finalRotation);
+		}
+
+		// SCALING
+		const int firstScalingIndex = GetScaleIndex(animationTime);
+		const int secondScalingIndex = firstScalingIndex + 1;
+
+		const auto scaleFactor = GetScaleFactor(scales[firstScalingIndex].timeStamp, scales[secondScalingIndex].timeStamp, animationTime);
+
+		glm::mat4 scalingMatrix;
+		if (numScalings == 1)
+		{
+			scalingMatrix = glm::scale(glm::mat4(1.0f), scales[0].scale);
+		}
+		else
+		{
+			const auto scaleOne = scales[firstScalingIndex].scale.x;
+			const auto scaleTwo = scales[secondScalingIndex].scale.x;
+			const auto finalScale = std::pow(scaleOne / scaleTwo, scaleFactor) * scaleOne;
+
+			scalingMatrix = glm::scale(glm::mat4(1.0f), { finalScale, finalScale, finalScale });
+		}
+
+		auto result = translationMatrix * rotationMatrix * scalingMatrix;
+
+		return GLMInternalHelper::ConvertGLMMatrixToVQS(result);
 	}
 }

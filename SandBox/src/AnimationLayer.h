@@ -7,6 +7,7 @@
 #include "Galactica/Renderer/Model.h"
 
 #include "Galactica/Layer.h"
+#include "Galactica/Renderer/Line.h"
 
 class AnimationLayer : public Galactica::Layer
 {
@@ -44,6 +45,8 @@ private:
 
 	Galactica::Shader ModelShader;
 
+	Galactica::Shader LineShader;
+
 	Galactica::CameraControl camera;
 
 	Galactica::Animation animation;
@@ -56,6 +59,6 @@ private:
 
 	Galactica::Mesh floormesh;
 
-	Galactica::Mesh bones;
+	Galactica::Line bones;
 };
 

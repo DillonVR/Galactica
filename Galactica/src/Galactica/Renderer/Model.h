@@ -14,6 +14,8 @@ namespace Galactica
 {
 	unsigned int TextureFromFile(const char* path, const std::string& directory, bool gamma = false);
 
+	#define MAX_BONE 100
+
 	struct BoneInfo
 	{
 		int id;
@@ -25,7 +27,7 @@ namespace Galactica
 		glm::vec3 start;
 		glm::vec3 end;
 	};
-
+	
 	class GALACTICA_API Model
 	{
 	public:

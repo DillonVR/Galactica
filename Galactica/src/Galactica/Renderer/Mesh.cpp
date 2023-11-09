@@ -24,11 +24,6 @@ namespace Galactica
         InitMesh();
 	}
 
-	// void Mesh::lineBone(const std::vector<Galactica::BoneLine>& vertices)
-	// {
- //        this->vertices = vertices;
-	// }
-
 	void Mesh::DebugMode(bool set)
 	{
         if (set == true)

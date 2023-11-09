@@ -1,185 +1,86 @@
 #pragma once
 
-#include "Swizzle.h"
-#include "MathFunctions.h"
 #include <ostream>
-#include <initializer_list>
-#include <array>
 
-namespace sol
+namespace Galactica
 {
-	class state;
-}
-
-namespace Galactica::Math
-{
-	template <typename T> class Vec3;
-	template <typename T> class Vec4;
-
 	template <typename T>
 	class Vec2
 	{
 	public:
+		// Declare variables
 		union
 		{
-			std::array<T, 2> data;
-
-			struct
+			struct 
 			{
 				T x, y;
 			};
 
-			Swizzle<Vec2, T, 2, 0, 0> xx;
-			Swizzle<Vec2, T, 2, 0, 1> xy;
-			Swizzle<Vec2, T, 2, 1, 0> yx;
-			Swizzle<Vec2, T, 2, 1, 1> yy;
-
-			Swizzle<Vec3, T, 2, 0, 0, 0> xxx;
-			Swizzle<Vec3, T, 2, 0, 0, 1> xxy;
-			Swizzle<Vec3, T, 2, 0, 1, 0> xyx;
-			Swizzle<Vec3, T, 2, 0, 1, 1> xyy;
-			Swizzle<Vec3, T, 2, 1, 0, 0> yxx;
-			Swizzle<Vec3, T, 2, 1, 0, 1> yxy;
-			Swizzle<Vec3, T, 2, 1, 1, 0> yyx;
-			Swizzle<Vec3, T, 2, 1, 1, 1> yyy;
-
-			Swizzle<Vec4, T, 2, 0, 0, 0, 0> xxxx;
-			Swizzle<Vec4, T, 2, 0, 0, 0, 1> xxxy;
-			Swizzle<Vec4, T, 2, 0, 0, 1, 0> xxyx;
-			Swizzle<Vec4, T, 2, 0, 0, 1, 1> xxyy;
-			Swizzle<Vec4, T, 2, 0, 1, 0, 0> xyxx;
-			Swizzle<Vec4, T, 2, 0, 1, 0, 1> xyxy;
-			Swizzle<Vec4, T, 2, 0, 1, 1, 0> xyyx;
-			Swizzle<Vec4, T, 2, 0, 1, 1, 1> xyyy;
-			Swizzle<Vec4, T, 2, 1, 0, 0, 0> yxxx;
-			Swizzle<Vec4, T, 2, 1, 0, 0, 1> yxxy;
-			Swizzle<Vec4, T, 2, 1, 0, 1, 0> yxyx;
-			Swizzle<Vec4, T, 2, 1, 0, 1, 1> yxyy;
-			Swizzle<Vec4, T, 2, 1, 1, 0, 0> yyxx;
-			Swizzle<Vec4, T, 2, 1, 1, 0, 1> yyxy;
-			Swizzle<Vec4, T, 2, 1, 1, 1, 0> yyyx;
-			Swizzle<Vec4, T, 2, 1, 1, 1, 1> yyyy;
+			std::array<T, 2> variables;
 		};
 
-		Vec2();
-		Vec2(std::initializer_list<T> args);
-		Vec2(const T x, const T y);
-		Vec2(const T scalar);
-		Vec2(const Vec2<T>& vector);
+		constexpr Vec2() noexcept;
+
+		constexpr Vec2(T x, T y) noexcept;
+
+		constexpr Vec2(T value) noexcept;
+
+		constexpr Vec2(std::initializer_list<T> data) noexcept;
+
+		explicit constexpr Vec2(const Vec2& vector) noexcept;
 
 		~Vec2() = default;
 
-		T Magnitude() const;
-		T SqrMagnitude() const;
-		Vec2<T> GetNormalize() const;
-		Vec2<T>& Normalize();
-		Vec2<T> GetRenormalize() const;
-		Vec2<T>& Renormalize();
-		Vec2<T> GetNegate() const;
-		Vec2<T>& Negate();
-		Vec2<T> GetAbsoluteValue();
-		T GetLargestElement() const;
-		const T* GetValuePointer() const;
-		const std::string ToString() const;
+		// Operations
+		Vec2& operator=(const Vec2& vector);
 
-		static T Dot(const Vec2<T>& leftVector, const Vec2<T>& rightVector);
-		static Vec2<T> Project(const Vec2<T>& leftVector, const Vec2<T>& rightVector);
-		static Vec2<T> Reject(const Vec2<T>& leftVector, const Vec2<T>& rightVector);
-		static Vec2<T> Lerp(const Vec2<T>& leftVector, const Vec2<T>& rightVector, const T t);
-		static Vec2<T> Zero();
-		static Vec2<T> XAxis();
-		static Vec2<T> YAxis();
-		static Vec2<T> Up();
-		static Vec2<T> Down();
-		static Vec2<T> Left();
-		static Vec2<T> Right();
+		Vec2 operator+(const Vec2& vector);
 
-		Vec2<T>& operator=(const Vec2<T>& vector);
-		Vec2<T>& operator+=(const Vec2<T>& vector);
-		Vec2<T>& operator-=(const Vec2<T>& vector);
+		Vec2& operator+=(const Vec2& vector);
 
-		Vec2<T>& operator*=(const T scalar);
-		Vec2<T>& operator/=(const T scalar);
+		Vec2 operator-(const Vec2& vector);
 
-		friend bool operator==(const Vec2<T>& leftVector, const Vec2<T>& rightVector)
+		Vec2& operator-=(const Vec2& vector);
+
+		Vec2 operator*(T value);
+
+		Vec2& operator*=(T value);
+
+		Vec2 operator/(T value);
+
+		Vec2& operator/=(T value);
+
+		bool operator==(const Vec2& vector);
+
+		bool operator!=(const Vec2& vector);
+
+		const T* GetPointerToData() const;
+
+		friend std::ostream& operator<<(std::ostream& os, const Vec2& vector)
 		{
-			return NearEquals(leftVector.x, rightVector.x) &&
-				NearEquals(leftVector.y, rightVector.y);
+			os << "[" << vector.x << ", " << vector.y << "]";
+			return os;
 		}
 
-		friend bool operator!=(const Vec2<T>& leftVector, const Vec2<T>& rightVector)
-		{
-			return !(leftVector == rightVector);
-		}
+		// Core Functions
+		bool HasNaNs() const;
 
-		friend Vec2<T> operator+(const Vec2<T>& leftVector, const Vec2<T>& rightVector)
-		{
-			Vec2<T> leftVectorCopy = leftVector;
-			return leftVectorCopy += rightVector;
-		}
+		bool HasInfinite() const;
 
-		friend Vec2<T> operator-(const Vec2<T>& leftVector, const Vec2<T>& rightVector)
-		{
-			Vec2<T> leftVectorCopy = leftVector;
-			return leftVectorCopy -= rightVector;
-		}
+		static bool IsZero(const Vec2& vector);
 
-		friend Vec2<T> operator*(const Vec2<T>& leftVector, const Vec2<T>& rightVector)
-		{
-			Vec2<T> result;
+		T LengthSquared() const;
 
-			result.x = leftVector.x * rightVector.x;
-			result.y = leftVector.y * rightVector.y;
+		T Length() const;
 
-			return result;
-		}
+		Vec2& GetNormalize();
 
-		friend Vec2<T> operator*(const Vec2<T>& vector, const T scalar)
-		{
-			Vec2<T> vectorCopy = vector;
-			return vectorCopy *= scalar;
-		}
+		static Vec2 Normalize(const Vec2& vector);
 
-		friend Vec2<T> operator*(const T scalar, const Vec2<T>& vector)
-		{
-			Vec2<T> vectorCopy = vector;
-			return vectorCopy *= scalar;
-		}
+		static T Dot(const Vec2& lhs, const Vec2& rhs);
 
-		friend Vec2<T> operator/(const Vec2<T>& vector, const T scalar)
-		{
-			Vec2<T> vectorCopy = vector;
-			return vectorCopy /= scalar;
-		}
-
-		friend Vec2<T> operator/(const T scalar, const Vec2<T>& vector)
-		{
-			Vec2<T> vectorCopy = vector;
-			return vectorCopy /= scalar;
-		}
-
-		friend std::ostream& operator<<(std::ostream& stream, const Vec2<T>& vector)
-		{
-			stream << "(" << vector.x << ", " << vector.y << ")";
-			return stream;
-		}
-
-		static void InitializeClassWithSol(const std::shared_ptr<sol::state>& luaState);
-
-	private:
-		Vec2 Add(const Vec2& vector);
-
-		Vec2 Subtract(const Vec2& vector);
-
-		Vec2 Multiply(const Vec2& vector);
-
-		Vec2 Multiply(T scalar);
-
-		Vec2 Divide(T scalar);
+		static T AbsDot(const Vec2& lhs, const Vec2& rhs);
 	};
-
-	using Vec2F = Vec2<float>;
-	using Vec2D = Vec2<double>;
-}
+};
 
 #include "Vec2.inl"

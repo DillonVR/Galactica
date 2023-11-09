@@ -78,6 +78,7 @@ namespace Galactica
 		for (int i = 0; i < src->mNumChildren; i++)
 		{
 			AssimpNodeData newData;
+			newData.parent = &dest;
 			ReadHeirarchyData(newData, src->mChildren[i]);
 			dest.children.push_back(newData);
 		}
