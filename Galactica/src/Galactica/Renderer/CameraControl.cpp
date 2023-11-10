@@ -35,10 +35,10 @@ namespace Galactica
 		}
 
 		if (Input::IsKeyPressed(Key::KP4))
-			cameraFocalPoint += GetRightDirection() * 0.01f * cameraDistance;
+			cameraFocalPoint -= GetRightDirection() * 0.01f * cameraDistance;
 
 		if (Input::IsKeyPressed(Key::KP6))
-			cameraFocalPoint += -GetRightDirection() * 0.01f * cameraDistance;
+			cameraFocalPoint -= -GetRightDirection() * 0.01f * cameraDistance;
 
 		if (Input::IsKeyPressed(Key::KPAdd))
 		{
@@ -53,20 +53,20 @@ namespace Galactica
 		if (Input::IsKeyPressed(Key::KP0))
 		{
 			float yawSign = GetUpDirection().y < 0 ? -1.0f : 1.0f;
-			cameraYaw -= yawSign * 0.03f * RotationSpeed();
+			cameraYaw += yawSign * 0.03f * RotationSpeed();
 		}
 
 		if (Input::IsKeyPressed(Key::KPDecimal))
 		{
 			float yawSign = GetUpDirection().y < 0 ? -1.0f : 1.0f;
-			cameraYaw += yawSign * 0.03f * RotationSpeed();
+			cameraYaw -= yawSign * 0.03f * RotationSpeed();
 		}
 
 		if (Input::IsKeyPressed(Key::KP2))
-			cameraFocalPoint += GetUpDirection() * 0.01f * cameraDistance;
+			cameraFocalPoint += -GetUpDirection() * 0.01f * cameraDistance;
 
 		if (Input::IsKeyPressed(Key::KP8))
-			cameraFocalPoint += -GetUpDirection() * 0.01f * cameraDistance;
+			cameraFocalPoint += GetUpDirection() * 0.01f * cameraDistance;
 
 		if (Input::IsKeyPressed(Key::KP5))
 		{

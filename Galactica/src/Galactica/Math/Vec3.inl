@@ -231,19 +231,4 @@ namespace Galactica
 	{
 		return Vec3(vector[x], vector[y], vector[z]);
 	}
-
-	template <typename T>
-	void Vec3<T>::CoordinateSystem(const Vec3& firstVector, Vec3* secondVector, Vec3* thirdVector)
-	{
-		if (std::abs(firstVector.x) > std::abs(firstVector.y))
-		{
-			*secondVector = Vec3<T>(-firstVector.z, 0, firstVector.x) / std::sqrt(firstVector.x * firstVector.x + firstVector.z * firstVector.z);
-		}
-		else
-		{
-			*secondVector = Vec3<T>(0, firstVector.z, -firstVector.y) / std::sqrt(firstVector.y * firstVector.y + firstVector.z * firstVector.z);
-		}
-
-		*thirdVector = Cross(firstVector, secondVector);
-	}
 }

@@ -8,11 +8,12 @@
 
 namespace Galactica
 {
+	//Helper Class to convert  Assimp Matrices to our format
 	class AssimpToGLMH
 	{
 	public:
 
-		static inline glm::mat4 ConvertMatrixToGLMFormat(const aiMatrix4x4& from)
+		static glm::mat4 ConvertMatrixToGLMFormat(const aiMatrix4x4& from)
 		{
 			glm::mat4 to;
 			//the a,b,c,d in assimp is the row ; the 1,2,3,4 is the column
@@ -23,7 +24,7 @@ namespace Galactica
 			return to;
 		}
 
-		static inline glm::vec3 GetGLMVec(const aiVector3D& vec)
+		static glm::vec3 GetGLMVec(const aiVector3D& vec)
 		{
 			return glm::vec3(vec.x, vec.y, vec.z);
 		}

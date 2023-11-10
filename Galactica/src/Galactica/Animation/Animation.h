@@ -17,6 +17,7 @@ namespace Galactica
 		AssimpNodeData* parent;
 
 	};
+
 	class GALACTICA_API Animation
 	{
 	public:
@@ -28,13 +29,13 @@ namespace Galactica
 
 		Bone* FindBone(const std::string& name);
 
-		inline float GetTicksPerSecond() { return ticksPerSecond; }
+		float GetTicksPerSecond() { return ticksPerSecond; }
 
-		inline float GetDuration() { return duration; }
+		float GetDuration() { return duration; }
 
-		inline const AssimpNodeData& GetRootNode() { return rootNode; }
+		const AssimpNodeData& GetRootNode() { return rootNode; }
 
-		inline const std::map<std::string, BoneInfo>& GetBoneIDMap()
+		const std::map<std::string, BoneInfo>& GetBoneIDMap()
 		{
 			return boneInfoMap;
 		}

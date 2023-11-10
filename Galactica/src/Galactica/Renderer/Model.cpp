@@ -36,9 +36,7 @@ namespace Galactica
 		}
 		
 		directory = path.substr(0, path.find_last_of('/'));
-        GL_LOGGER_INFO("Assimp : Reading Done");
 
-        GL_LOGGER_INFO("Assimp :Processing Node");
 		processNode(scene->mRootNode, scene);
         GL_LOGGER_INFO("Assimp :Processing Node Done");
 	}
@@ -121,7 +119,6 @@ namespace Galactica
 		for (unsigned int i = 0; i < node->mNumChildren; i++)
 		{
 			processNode(node->mChildren[i], scene);
-            GL_LOGGER_INFO("Assimp :Processing chilren Node " + std::to_string(i)+ "/" + std::to_string(node->mNumChildren - 1));
 		}
 	}
 

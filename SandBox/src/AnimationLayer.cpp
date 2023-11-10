@@ -50,10 +50,11 @@
 		//load the models
 		GL_LOGGER_INFO("----------------------Loading model--------------------");
 		GL_LOGGER_INFO("Loading model Solider");
+
 		ourModel.LoadModel("assets/Soldier/Soldier.dae", false);
-		// GL_LOGGER_INFO("Loading model Bag");
-		// backpackModel.LoadModel("assets/backpack/backpack.obj", false);
+		
 		GL_LOGGER_INFO("Loading model done");
+
 		//load the animations
 		GL_LOGGER_INFO("---------------------Animations----------------------");
 		GL_LOGGER_INFO("Loading Dancing Animation");
@@ -129,15 +130,6 @@
 		//Draw debug
 
 		floormesh.DebugMode(debugMode);
-		//-----------------bag draw-----------------//
-
-		// auto Backpack = glm::mat4(1.0f);
-		// Backpack = glm::translate(Backpack, glm::vec3(3.0f, 1.0f, 0.0f));
-		// Backpack = glm::scale(Backpack, glm::vec3(0.5f, 0.5f, 0.5f));
-		//
-		// ModelShader.setMat4("model", Backpack);
-		//
-		// backpackModel.DrawModel(ModelShader);
 	}
 
 	void AnimationLayer::OnImGuiRender()

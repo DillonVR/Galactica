@@ -36,13 +36,13 @@ namespace Galactica
 
 		void Update(float animationTime);
 
-		glm::mat4 getLocalTransform();
+		glm::mat4 getLocalTransform() const;
 
 		const VQS& GetLocalVQS() const;
 
 		std::string GetBoneName() const;
 
-		int GetBoneID();
+		int GetBoneID() const;
 
 		int GetPosIndex(float animationTime) const;
 
@@ -59,11 +59,11 @@ namespace Galactica
 		//
 		// glm::mat4 InterpolateScale(float animationTime);
 
-		glm::mat4 InterpolateVQSPos(float animationTime);
+		glm::mat4 InterpolateVQSPos(float animationTime) const;
 		
-		glm::mat4 InterpolateVQSRot(float animationTime);
+		glm::mat4 InterpolateVQSRot(float animationTime) const;
 		
-		glm::mat4 InterpolateVQSScale(float animationTime);
+		glm::mat4 InterpolateVQSScale(float animationTime) const;
 
 		VQS InterpolateWithVQS(float animationTime) const;
 

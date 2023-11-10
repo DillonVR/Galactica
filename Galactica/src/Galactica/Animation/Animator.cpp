@@ -6,6 +6,7 @@
 
 namespace Galactica
 {
+	//Initial setup of the animator
 	void Animator::Play(Animation* pAnimation)
 	{
 		currentAnimation = pAnimation;
@@ -15,17 +16,16 @@ namespace Galactica
 		debugBone.resize(200);
 
 		for (int i = 0; i < 100; i++)
-			finalBoneMatrices.push_back(glm::mat4(1.0f));
+			finalBoneMatrices.emplace_back(glm::mat4(1.0f));
 	}
 
+	// Calculate each bones transformation using GLM -- We don't use use this function
 	void Animator::CalcBoneTransformation(const AssimpNodeData* node, glm::mat4 parentTransform)
 	{
 		std::string nodeName = node->name;
 		glm::mat4 nodeTransform = node->transformation;
 
-		Bone* Bone = currentAnimation->FindBone(nodeName);
-
-		if (Bone)
+		if (Bone* Bone = currentAnimation->FindBone(nodeName))
 		{
 			Bone->Update(currentTime);
 			nodeTransform = Bone->getLocalTransform();
@@ -52,6 +52,7 @@ namespace Galactica
 			CalcBoneTransformation(&node->children[i], globalTransformation);
 	}
 
+	// Calculate each bones transformation using VQS 
 	void Animator::CalcBoneTransformationVQS(const AssimpNodeData* node, VQS parentTransform)
 	{
 		std::string nodeName = node->name;
@@ -89,6 +90,7 @@ namespace Galactica
 		return finalBoneMatrices;
 	}
 
+	//use VQS to update the Animation
 	void Animator::UpdateAnimation(float time)
 	{
 		deltaTime = time;

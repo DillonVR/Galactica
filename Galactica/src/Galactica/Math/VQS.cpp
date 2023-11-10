@@ -8,7 +8,6 @@ namespace Galactica
 {
 	VQS::VQS()
 		: translationVector(),
-		quatRotation(),
 		scalingVector(1.0f)
 	{
 	}
@@ -150,10 +149,7 @@ namespace Galactica
 
 		const auto translate =
 			GLMInternalHelper::ConvertInternalVectorToGLM(
-				Vec3f::Lerp(
-					vqsOneTranslateInternal,
-					vqsTwoTranslateInternal,
-					t_Translation));
+				Vec3f::Lerp(vqsOneTranslateInternal,vqsTwoTranslateInternal,t_Translation));
 
 		const auto rotation =
 				QuatFloat::Slerp(vqsOne.quatRotation,vqsTwo.quatRotation,t_Rotation).Normalize();

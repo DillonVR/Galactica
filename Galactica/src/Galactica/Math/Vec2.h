@@ -31,23 +31,14 @@ namespace Galactica
 
 		~Vec2() = default;
 
-		// Operations
 		Vec2& operator=(const Vec2& vector);
-
 		Vec2 operator+(const Vec2& vector);
-
 		Vec2& operator+=(const Vec2& vector);
-
 		Vec2 operator-(const Vec2& vector);
-
 		Vec2& operator-=(const Vec2& vector);
-
 		Vec2 operator*(T value);
-
 		Vec2& operator*=(T value);
-
 		Vec2 operator/(T value);
-
 		Vec2& operator/=(T value);
 
 		bool operator==(const Vec2& vector);
@@ -55,12 +46,6 @@ namespace Galactica
 		bool operator!=(const Vec2& vector);
 
 		const T* GetPointerToData() const;
-
-		friend std::ostream& operator<<(std::ostream& os, const Vec2& vector)
-		{
-			os << "[" << vector.x << ", " << vector.y << "]";
-			return os;
-		}
 
 		// Core Functions
 		bool HasNaNs() const;

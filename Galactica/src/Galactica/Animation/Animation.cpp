@@ -7,6 +7,7 @@
 
 namespace Galactica
 {
+	//Use Assimp to Load in animations
 	void Animation::LoadAnimation(const std::string& animationPath, Model* model)
 	{
 		Assimp::Importer importer;
@@ -15,7 +16,7 @@ namespace Galactica
 
 		assert(scene && scene->mRootNode);
 
-		auto animation = scene->mAnimations[0];
+		const auto animation = scene->mAnimations[0];
 
 		duration = animation->mDuration;
 
@@ -30,6 +31,7 @@ namespace Galactica
 		
 	}
 
+	//Find Bone if bone map has it.
 	Bone* Animation::FindBone(const std::string& name)
 	{
 		auto iter = std::find_if(bones.begin(), bones.end(),
@@ -38,15 +40,19 @@ namespace Galactica
 				return Bone.GetBoneName() == name;
 			}
 		);
-		if (iter == bones.end()) return nullptr;
-		else return &(*iter);
+		if (iter == bones.end())
+		{
+			return nullptr;
+		}
+		return &(*iter);
 	}
 
+	
 	void Animation::ReadMissingBones(const aiAnimation* animation, Model& model)
 	{
 		int size = animation->mNumChannels;
 
-		auto& boneInfo = model.GetBoneMap();
+		const auto& boneInfo = model.GetBoneMap();
 		int& boneCount = model.GetBoneCount(); 
 
 		//reading channels(bones engaged in an animation and their keyframes)
@@ -67,9 +73,10 @@ namespace Galactica
 		boneInfoMap = boneInfo;
 	}
 
+	// Read in Heirarchy
 	void Animation::ReadHeirarchyData(AssimpNodeData& dest, const aiNode* src)
 	{
-		assert(src);
+		GL_ASSERT(src);
 
 		dest.name = src->mName.data;
 		dest.transformation = AssimpToGLMH::ConvertMatrixToGLMFormat(src->mTransformation);

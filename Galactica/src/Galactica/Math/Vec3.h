@@ -27,26 +27,25 @@ namespace Galactica
 		};
 
 		constexpr Vec3() noexcept;
+
 		constexpr Vec3(const Vec3& vector) noexcept;
+
 		constexpr Vec3(T x, T y, T z) noexcept;
+
 		constexpr Vec3(T value) noexcept;
+
 		constexpr Vec3(std::initializer_list<T> data) noexcept;
-		
 
 		~Vec3() = default;
 
 		// Operations
 		Vec3& operator=(const Vec3& vector);
-
 		Vec3 operator+(const Vec3& vector);
 		Vec3& operator+=(const Vec3& vector);
-
 		Vec3 operator-(const Vec3& vector);
 		Vec3& operator-=(const Vec3& vector);
-
 		Vec3 operator*(T value);
 		Vec3& operator*=(T value);
-
 		Vec3 operator/(T value);
 		Vec3& operator/=(T value);
 
@@ -73,7 +72,6 @@ namespace Galactica
 			return os;
 		}
 
-		// Core Functions
 		bool HasNaNs() const;
 		bool HasInfinite() const;
 
@@ -92,16 +90,12 @@ namespace Galactica
 
 		static Vec3 Lerp(const Vec3& vecOne, const Vec3& vecTwo, T t);
 
-		// Misc Operations
 		static T MinComponent(const Vec3& vector);
 		static T MaxComponent(const Vec3& vector);
 
 		Vec3 Min(const Vec3& lhsVector, const Vec3& rhsVector);
 		Vec3 Max(const Vec3& lhsVector, const Vec3& rhsVector);
 		Vec3 Permute(const Vec3& vector, int x, int y, int z);
-
-		// Assumes firstVector passed has already been normalized
-		void CoordinateSystem(const Vec3& firstVector, Vec3* secondVector, Vec3* thirdVector);
 	};
 	using Vec3f = Vec3<float>;
 }
