@@ -17,7 +17,7 @@ namespace Galactica
 		UpdateView();
 	}
 
-	void CameraControl::OnUpdate(Timestep ts)
+	void CameraControl::OnUpdate(float ts)
 	{
 
 		if (Input::IsKeyPressed(Key::LeftAlt))

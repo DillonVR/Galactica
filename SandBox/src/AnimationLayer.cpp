@@ -9,69 +9,80 @@
 #include "Galactica/Vendor/imgui/imgui.h"
 
 	AnimationLayer::AnimationLayer()
-		:	Layer("Example"),
-			AnimationShader("Shaders/animationShader.vert", "Shaders/animationShader.frag"),
-			ModelShader("Shaders/modelShader.vert", "Shaders/modelShader.frag"),
-			LineShader("Shaders/lineShader.vert", "Shaders/lineShader.frag"),
-			camera(45.0f, 1, 0.1f, 1000)
+	: Layer("Example"),
+	AnimationShader("Shaders/animationShader.vert", "Shaders/animationShader.frag"),
+	ModelShader("Shaders/modelShader.vert", "Shaders/modelShader.frag"),
+	LineShader("Shaders/lineShader.vert", "Shaders/lineShader.frag"),
+	camera(45.0f, 1, 0.1f, 1000),
+	path(0)
+
+{
+	int size = 10;
+
+	// create vertices and indices for a checked floor
+	for (int i = 0; i < size; ++i)
 	{
-		int size = 10;
+		for (int j = 0; j < size; ++j)
+		{
+			// create 4 vertices for each quad
+			Galactica::Vertex v1, v2, v3, v4, v5, v6, v7, v8;
 
-		// create vertices and indices for a checked floor
-		for (int i = 0; i < size; ++i) {
-			for (int j = 0; j < size; ++j) {
-				// create 4 vertices for each quad
-				Galactica::Vertex v1, v2, v3, v4, v5, v6, v7, v8;
+			v1.Position = glm::vec3(i, 0, j);
+			v2.Position = glm::vec3(i + 1, 0, j);
+			v3.Position = glm::vec3(i + 1, 0, j + 1);
+			v4.Position = glm::vec3(i, 0, j + 1);
 
-				v1.Position = glm::vec3(i, 0, j);
-				v2.Position = glm::vec3(i + 1, 0, j);
-				v3.Position = glm::vec3(i + 1, 0, j + 1);
-				v4.Position = glm::vec3(i, 0, j + 1);
+			vertices.push_back(v1);
+			vertices.push_back(v2);
+			vertices.push_back(v3);
+			vertices.push_back(v4);
 
-				vertices.push_back(v1);
-				vertices.push_back(v2);
-				vertices.push_back(v3);
-				vertices.push_back(v4);
-
-				// // create indices
-				int start = (i * size + j) * 4;
-				indices.push_back(start);
-				indices.push_back(start + 1);
-				indices.push_back(start + 2);
-				indices.push_back(start + 2);
-				indices.push_back(start + 3);
-				indices.push_back(start);
-			}
+			// // create indices
+			int start = (i * size + j) * 4;
+			indices.push_back(start);
+			indices.push_back(start + 1);
+			indices.push_back(start + 2);
+			indices.push_back(start + 2);
+			indices.push_back(start + 3);
+			indices.push_back(start);
 		}
-
-		//int floor mesh
-		floormesh.lineMesh(vertices,indices);
-
-		//load the models
-		GL_LOGGER_INFO("----------------------Loading model--------------------");
-		GL_LOGGER_INFO("Loading model Solider");
-
-		ourModel.LoadModel("assets/Soldier/Soldier.dae", false);
-		
-		GL_LOGGER_INFO("Loading model done");
-
-		//load the animations
-		GL_LOGGER_INFO("---------------------Animations----------------------");
-		GL_LOGGER_INFO("Loading Dancing Animation");
-		animation.LoadAnimation("assets/Animations/SillyDancing.dae", &ourModel);
-		GL_LOGGER_INFO("Loading Walking animation");
-		Walking.LoadAnimation("assets/Animations/Walking.dae", &ourModel);
-		GL_LOGGER_INFO("Loading Strafe");
-		strafe.LoadAnimation("assets/Animations/Strafe.dae", &ourModel);
-
-		animator.Play(&Walking);
 	}
 
-	void AnimationLayer::OnUpdate(Galactica::Timestep ts)
+	//int floor mesh
+	floormesh.lineMesh(vertices, indices);
+	
+
+	//load the models
+	GL_LOGGER_INFO("----------------------Loading model--------------------");
+	GL_LOGGER_INFO("Loading model Solider");
+
+	ourModel.LoadModel("assets/Soldier/Soldier.dae", false);
+
+	GL_LOGGER_INFO("Loading model done");
+
+	//load the animations
+	GL_LOGGER_INFO("---------------------Animations----------------------");
+	GL_LOGGER_INFO("Loading Dancing Animation");
+	idle.LoadAnimation("assets/Animations/Idle.dae", &ourModel);
+	GL_LOGGER_INFO("Loading Walking animation");
+	Walking.LoadAnimation("assets/Animations/Walking.dae", &ourModel);
+	GL_LOGGER_INFO("Loading Strafe");
+	running.LoadAnimation("assets/Animations/Running.dae", &ourModel);
+
+	animator.Play(&running);
+}
+
+	void AnimationLayer::OnUpdate(Galactica::StepTimer const& timer)
 	{
+
+		float ts = static_cast<float> (timer.GetElapsedSeconds());
+
 		camera.OnUpdate(ts);
 
-		animator.UpdateAnimation(ts);
+		//get the translation and rotation
+		glm::mat4 movement = path.Update(timer);
+
+		animator.UpdateAnimation(ts, path.m_NormalizedTime, path.m_SpeedFactor);
 
 		const glm::mat4 projection = camera.GetViewProjection();
 
@@ -80,10 +91,12 @@
 		AnimationShader.Use();
 		AnimationShader.setMat4("projectionView", projection);
 
+		
 		auto model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
 
+		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+		model = movement;
+		
 		AnimationShader.setMat4("animation", model);
 
 		const auto transforms = animator.GetFinalBoneMatrices();
@@ -95,6 +108,19 @@
 		{
 			ourModel.DrawModel(AnimationShader);
 		}
+		//-----------------Path draw-----------------//
+		if (showPath)
+		{
+			LineShader.Use();
+			LineShader.setMat4("projection", projection);
+			auto pathMat = glm::mat4(1.0f);
+
+			pathMat = glm::scale(pathMat, glm::vec3(1.0f, 1.0f, 1.0f));
+			LineShader.setMat4("model", pathMat);
+
+			drawPath.SetLine(path.m_PlotPoints);
+			drawPath.DrawLine(LineShader, 1);
+		}
 
 		//-----------------Bones draw-----------------//
 		if (showBones)
@@ -105,9 +131,11 @@
 			auto debugBone = glm::mat4(1.0f);
 
 			debugBone = glm::scale(debugBone, glm::vec3(1.0f, 1.0f, 1.0f));
+			debugBone = movement;
 			LineShader.setMat4("model", debugBone);
 
-			bones.DrawLine(LineShader);
+			bones.DrawLine(LineShader,2);
+
 		}
 
 		//-----------------Floor draw-----------------//
@@ -118,8 +146,8 @@
 		float angleInRadians = glm::radians(angleInDegrees);
 
 		auto floor = glm::mat4(1.0f);
-		floor = glm::translate(floor, glm::vec3(-10.0f, 0.0f, 20.0f));
-		floor = glm::scale(floor, glm::vec3(3.0f, 1.0f, 3.0f));
+		floor = glm::translate(floor, glm::vec3(-35.0f, 0.0f, 20.0f));
+		floor = glm::scale(floor, glm::vec3(7.0f, 1.0f, 7.0f));
 		floor = glm::rotate(floor, angleInRadians, glm::vec3(1.0f, 0.0f, 0.0f));
 		float floorColor = 1.0f;
 
@@ -141,49 +169,52 @@
 		ImGui::Checkbox("Debug", &debugMode);
 		ImGui::Checkbox("Bones", &showBones);
 		ImGui::Checkbox("Skin", &showSkin);
+		ImGui::Checkbox("Path", &showPath);
 
-		const char* items[] = {"Walking","Dancing","Strafe"};
-		static int item_current_idx = 0; 
-		static int item_last_idx = 0;
+		// const char* items[] = {"Idle","Walking","Running"};
+		// static int item_current_idx = 0; 
+		// static int item_last_idx = 0;
+		//
+		// if (ImGui::BeginListBox("Animations"))
+		// {
+		// 	if (item_current_idx != item_last_idx)
+		// 	{
+		// 		flag = true;
+		// 		item_last_idx = item_current_idx;
+		// 	}
+		// 		
+		// 	for (int n = 0; n < IM_ARRAYSIZE(items); n++)
+		// 	{
+		// 		const bool is_selected = (item_current_idx == n);
+		// 		if (ImGui::Selectable(items[n], is_selected))
+		// 			item_current_idx = n;
+		//
+		// 		if(item_current_idx == 0 && flag == true)
+		// 		{
+		// 			animator.Play(&idle);
+		// 			flag = false;
+		// 		}
+		//
+		// 		if(item_current_idx == 1 && flag == true)
+		// 		{
+		// 			animator.Play(&Walking);
+		// 			flag = false;
+		// 		}
+		//
+		// 		if (item_current_idx == 2 && flag == true)
+		// 		{
+		// 			animator.Play(&running);
+		// 			flag = false;
+		// 		}
+		//
+		// 		if (is_selected)
+		// 			ImGui::SetItemDefaultFocus();
+		// 			
+		// 	}
+		// 	ImGui::EndListBox();
+
+		ImGui::Text("Velocity : %f", path.m_SpeedFactor);
 		
-		if (ImGui::BeginListBox("Animations"))
-		{
-			if (item_current_idx != item_last_idx)
-			{
-				flag = true;
-				item_last_idx = item_current_idx;
-			}
-				
-			for (int n = 0; n < IM_ARRAYSIZE(items); n++)
-			{
-				const bool is_selected = (item_current_idx == n);
-				if (ImGui::Selectable(items[n], is_selected))
-					item_current_idx = n;
-
-				if(item_current_idx == 0 && flag == true)
-				{
-					animator.Play(&Walking);
-					flag = false;
-				}
-
-				if(item_current_idx == 1 && flag == true)
-				{
-					animator.Play(&animation);
-					flag = false;
-				}
-
-				if (item_current_idx == 2 && flag == true)
-				{
-					animator.Play(&strafe);
-					flag = false;
-				}
-
-				if (is_selected)
-					ImGui::SetItemDefaultFocus();
-					
-			}
-			ImGui::EndListBox();
-		}
 		ImGui::End();
 	}
 

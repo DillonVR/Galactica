@@ -2,6 +2,7 @@
 
 #include "Bone.h"
 #include "AssimpToGLM.h"
+#include "Movement.h"
 #include "assimp/vector3.h"
 #include "Galactica/Math/MathHelper.h"
 
@@ -10,9 +11,10 @@
 namespace Galactica
 {
 	Bone::Bone(const std::string& name, int ID, const aiNodeAnim* channel)
-		:	name(name),
-			ID(ID),
-			localTransform(1.0f)
+		: name(name),
+		ID(ID),
+		localTransform(1.0f),
+		move(0)
 	{
 		numPositions = channel->mNumPositionKeys;
 
@@ -57,6 +59,7 @@ namespace Galactica
 		glm::mat4 translation = InterpolateVQSPos(animationTime);
 		glm::mat4 rotation = InterpolateVQSRot(animationTime);
 		glm::mat4 scale = InterpolateVQSScale(animationTime);
+		
 		auto result = translation * rotation * scale;
 
 		localVQS = GLMInternalHelper::ConvertGLMMatrixToVQS(result);
@@ -114,14 +117,13 @@ namespace Galactica
 
 	float Bone::GetScaleFactor(float lastTimeStamp, float nextTimeStamp, float animationTime)
 	{
-		float scaleFactor = 0.0f;
-		float midWay = animationTime - lastTimeStamp;
-		float diff = nextTimeStamp - lastTimeStamp;
+		const float midWay = animationTime - lastTimeStamp;
+		const float diff = nextTimeStamp - lastTimeStamp;
 
-		scaleFactor = midWay / diff;
+		const float scaleFactor = midWay / diff;
 		return scaleFactor;
 	}
-
+	// Translation of bones with vector (Lerp)
 	glm::mat4 Bone::InterpolateVQSPos(float animationTime) const
 	{
 		const int firstPositionIndex = GetPosIndex(animationTime);
@@ -140,14 +142,14 @@ namespace Galactica
 		{
 			const auto positionOne = GLMInternalHelper::ConvertGLMVectorToInternal(positions[firstPositionIndex].position);
 			const auto positionTwo = GLMInternalHelper::ConvertGLMVectorToInternal(positions[secondPositionIndex].position);
-
+			//Lerp
 			const auto finalPosition = GLMInternalHelper::ConvertInternalVectorToGLM(
 				Vec3f::Lerp(positionOne,positionTwo,positionScaleFactor));
 
 			return translate(glm::mat4(1.0f), finalPosition);
 		}
 	}
-
+	// Roatation of bones via VQS with  SLerp
 	glm::mat4 Bone::InterpolateVQSRot(float animationTime) const
 	{
 		const int firstRotationIndex = GetRotIndex(animationTime);
@@ -169,6 +171,7 @@ namespace Galactica
 			first = first.Normalize();
 			QuatFloat last = rotations[secondRotationIndex].orientation;
 			last = last.Normalize();
+			//SLerp
 			QuatFloat finalRotation = QuatFloat::Slerp(
 				first, last, rotationScaleFactor);
 			finalRotation = (finalRotation).Normalize();
@@ -176,13 +179,12 @@ namespace Galactica
 			return GLMInternalHelper::ConvertQuaternionToGLMMatrix(finalRotation);
 		}
 	}
-
+	// Scaling of bones
 	glm::mat4 Bone::InterpolateVQSScale(float animationTime) const
 	{
-		const int firstScalingIndex = GetScaleIndex(animationTime);
-		const int secondScalingIndex = firstScalingIndex + 1;
-
-		const auto scaleFactor = GetScaleFactor(scales[firstScalingIndex].timeStamp, scales[secondScalingIndex].timeStamp, animationTime);
+		const int scaleIndex = GetScaleIndex(animationTime);
+		const int secondScaleIndex = scaleIndex + 1;
+		glm::vec3 finalScale;
 
 		if (numScalings == 1)
 		{
@@ -190,12 +192,13 @@ namespace Galactica
 		}
 		else
 		{
-			const auto scaleOne = scales[firstScalingIndex].scale.x;
-			const auto scaleTwo = scales[secondScalingIndex].scale.x;
-			const auto finalScale = std::pow(scaleOne / scaleTwo, scaleFactor) * scaleOne;
+			float scaleFactor = GetScaleFactor(scales[scaleIndex].timeStamp, scales[secondScaleIndex].timeStamp, animationTime);
 
-			return scale(glm::mat4(1.0f), { finalScale, finalScale, finalScale });
+			finalScale = mix(scales[scaleIndex].scale, scales[secondScaleIndex].scale, scaleFactor);
 		}
+
+			
+		return glm::scale(glm::mat4(1.0f), finalScale);
 	}
 
 	//GLM POSITION, SCALING, ROTATION WITH GLM

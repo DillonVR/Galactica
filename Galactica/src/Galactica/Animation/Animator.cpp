@@ -52,6 +52,11 @@ namespace Galactica
 			CalcBoneTransformation(&node->children[i], globalTransformation);
 	}
 
+	void Animator::CalcBlendTranformation(float animationTime, std::vector<glm::mat4>& Transfomation,
+		unsigned startAnimation, unsigned endAnimation, float blendFactor)
+	{
+	}
+
 	// Calculate each bones transformation using VQS 
 	void Animator::CalcBoneTransformationVQS(const AssimpNodeData* node, VQS parentTransform)
 	{
@@ -61,6 +66,7 @@ namespace Galactica
 		if (Bone* Bone = currentAnimation->FindBone(nodeName))
 		{
 			Bone->Update(currentTime);
+			
 			nodeTransform = Bone->GetLocalVQS();
 		}
 
@@ -91,12 +97,20 @@ namespace Galactica
 	}
 
 	//use VQS to update the Animation
-	void Animator::UpdateAnimation(float time)
+	void Animator::UpdateAnimation(float time, float normTime, float speed)
 	{
-		deltaTime = time;
+		//deltaTime = time;
+
+		if (normTime < 0.2f || normTime > 0.8f)
+		{
+			deltaTime = time * speed;
+		}
+		else
+			deltaTime = time * 1.2f;
+
 		if (currentAnimation)
 		{
-			currentTime += currentAnimation->GetTicksPerSecond() * time;
+			currentTime += currentAnimation->GetTicksPerSecond() * deltaTime;
 			currentTime = fmod(currentTime, currentAnimation->GetDuration());
 			//CalcBoneTransformation(&currentAnimation->GetRootNode(), glm::mat4(1.0f));
 			CalcBoneTransformationVQS(&currentAnimation->GetRootNode(), VQS());

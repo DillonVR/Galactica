@@ -1,5 +1,6 @@
 #pragma once
 #include "Animation.h"
+#include "Movement.h"
 #include "Galactica/Math/VQS.h"
 
 namespace Galactica
@@ -9,11 +10,13 @@ namespace Galactica
 	public:
 		Animator() = default;
 
-		void UpdateAnimation(float time);
+		void UpdateAnimation(float time, float normTime, float speed);
 
 		void Play(Animation* pAnimation);
 
 		void CalcBoneTransformation(const AssimpNodeData* node, glm::mat4 parentTransform);
+
+		void CalcBlendTranformation(float animationTime, std::vector<glm::mat4>& Transfomation, unsigned int startAnimation, unsigned int endAnimation, float blendFactor);
 
 		void CalcBoneTransformationVQS(const AssimpNodeData* node, VQS parentTransform);
 
@@ -26,6 +29,8 @@ namespace Galactica
 		std::vector<glm::mat4> finalBoneMatrices;
 
 		Animation* currentAnimation;
+
+		Movement* path;
 
 		float currentTime;
 

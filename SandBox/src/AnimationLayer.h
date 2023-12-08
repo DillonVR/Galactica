@@ -7,6 +7,8 @@
 #include "Galactica/Renderer/Model.h"
 
 #include "Galactica/Layer.h"
+#include "Galactica/Animation/Movement.h"
+#include "Galactica/Math/Spline.h"
 #include "Galactica/Renderer/Line.h"
 
 class AnimationLayer : public Galactica::Layer
@@ -24,12 +26,14 @@ public:
 	bool showSkin = true;
 	bool debugMode = false;
 	bool animate = false;
+	bool showPath = true;
+	bool runPath = false;
 
 	bool flag = false;
 
 	AnimationLayer();
 
-	void OnUpdate(Galactica::Timestep ts) override;
+	void OnUpdate(Galactica::StepTimer const& ts) override;
 
 	void OnImGuiRender() override;
 
@@ -49,16 +53,20 @@ private:
 
 	Galactica::CameraControl camera;
 
-	Galactica::Animation animation;
+	Galactica::Animation idle;
 
 	Galactica::Animation Walking;
 
-	Galactica::Animation strafe;
+	Galactica::Animation running;
 
 	Galactica::Animator animator;
 
 	Galactica::Mesh floormesh;
 
 	Galactica::Line bones;
+
+	Galactica::Movement path;
+
+	Galactica::Line drawPath;
 };
 

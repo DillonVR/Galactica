@@ -7,6 +7,7 @@
 #include "Galactica/LayerStack.h"
 
 #include "Window.h"
+#include "Animation/StepTimer.h"
 #include "ImGui/ImGuiLayer.h"
 
 namespace Galactica {
@@ -23,7 +24,12 @@ namespace Galactica {
 		void OnEvent(Event& e);
 
 		void PushLayer(Layer* layer);
+
 		void PushOverLayer(Layer* layer);
+
+		void Tick();
+
+		void Update(Galactica::StepTimer const& timer);
 
 		static Application& Get() { return *s_Instance; }
 
@@ -45,6 +51,8 @@ namespace Galactica {
 		ImGuiLayer* m_imGUILayer;
 
 		LayerStack m_LayerStack;
+
+		StepTimer m_timer;
 	};
 
 	//defined in client App

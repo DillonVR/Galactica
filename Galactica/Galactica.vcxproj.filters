@@ -1323,6 +1323,12 @@
     <ClInclude Include="src\Galactica\Animation\Bone.h">
       <Filter>src\Galactica\Animation</Filter>
     </ClInclude>
+    <ClInclude Include="src\Galactica\Animation\Movement.h">
+      <Filter>src\Galactica\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Galactica\Animation\StepTimer.h">
+      <Filter>src\Galactica\Animation</Filter>
+    </ClInclude>
     <ClInclude Include="src\Galactica\Application.h">
       <Filter>src\Galactica</Filter>
     </ClInclude>
@@ -1395,6 +1401,9 @@
     <ClInclude Include="src\Galactica\Math\Quaternion.inl">
       <Filter>src\Galactica\Math</Filter>
     </ClInclude>
+    <ClInclude Include="src\Galactica\Math\Spline.h">
+      <Filter>src\Galactica\Math</Filter>
+    </ClInclude>
     <ClInclude Include="src\Galactica\Math\VQS.h">
       <Filter>src\Galactica\Math</Filter>
     </ClInclude>
@@ -1460,6 +1469,9 @@
     <ClCompile Include="src\Galactica\Animation\Bone.cpp">
       <Filter>src\Galactica\Animation</Filter>
     </ClCompile>
+    <ClCompile Include="src\Galactica\Animation\Movement.cpp">
+      <Filter>src\Galactica\Animation</Filter>
+    </ClCompile>
     <ClCompile Include="src\Galactica\Application.cpp">
       <Filter>src\Galactica</Filter>
     </ClCompile>
@@ -1474,6 +1486,9 @@
     </ClCompile>
     <ClCompile Include="src\Galactica\Logger\Logger.cpp">
       <Filter>src\Galactica\Logger</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Galactica\Math\Spline.cpp">
+      <Filter>src\Galactica\Math</Filter>
     </ClCompile>
     <ClCompile Include="src\Galactica\Math\VQS.cpp">
       <Filter>src\Galactica\Math</Filter>
