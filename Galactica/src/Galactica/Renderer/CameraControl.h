@@ -20,7 +20,7 @@ namespace Galactica
 
 		CameraControl(float fov, float aspectRatio, float nearClip, float farClip);
 
-		void OnUpdate(Timestep ts);
+		void OnUpdate(float ts);
 
 		void OnEvent(Event& e);
 
@@ -84,7 +84,7 @@ namespace Galactica
 
 		glm::vec2 cameraInitialMousePosition = { 0.0f, 0.0f };
 
-		float cameraDistance = 7.0f;
+		float cameraDistance = 25.0f;
 		float cameraPitch = 0.3f;
 		float cameraYaw = 0.0f;
 		float cameraViewportWidth = 1280;

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Movement.h"
 #include "assimp/scene.h"
 #include "Galactica/Math/VQS.h"
 
@@ -68,11 +69,15 @@ namespace Galactica
 		VQS InterpolateWithVQS(float animationTime) const;
 
 		std::vector<KeyPosition> positions;
+
 		std::vector<KeyRotation> rotations;
+
 		std::vector<KeyScale> scales;
 
 		int numPositions;
+
 		int numRotations;
+
 		int numScalings;
 
 		std::string name;
@@ -82,6 +87,8 @@ namespace Galactica
 		glm::mat4 localTransform;
 
 		VQS localVQS;
+
+		Movement move;
 
 	};
 }

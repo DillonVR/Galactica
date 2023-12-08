@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Animation/StepTimer.h"
 #include "Core/Timestep.h"
 #include "Galactica/Core.h"
 #include "Galactica/Events/Event.h"
@@ -14,7 +15,7 @@ namespace Galactica
 
 		virtual void OnAttach() {}
 		virtual void OnDetach() {}
-		virtual void OnUpdate(Timestep ts) {}
+		virtual void OnUpdate(StepTimer const& ts) {}
 		virtual void OnImGuiRender() {}
 		virtual void OnEvent(Event& event) {}
 

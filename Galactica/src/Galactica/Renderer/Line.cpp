@@ -16,10 +16,20 @@ namespace Galactica
 	{
 	}
 
-	void Line::DrawLine(Shader& shader)
+	void Line::DrawLine(Shader& shader, int type)
 	{
 		glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
-		glDrawArrays(GL_LINES, 0, lineVertices.size());
+		switch (type)
+		{
+		case 1:
+			glDrawArrays(GL_LINE_STRIP, 0, lineVertices.size());
+			break;
+		case 2:
+			glDrawArrays(GL_LINES, 0, lineVertices.size());
+			break;
+
+		}
+		
 	}
 
 	void Line::InitLine()

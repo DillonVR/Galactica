@@ -15,7 +15,7 @@ namespace Galactica
 
 		void DebugMode(bool set);
 
-		void DrawLine(Shader& shader);
+		void DrawLine(Shader& shader, int type);
 
 		std::vector<glm::vec3> lineVertices;
 		

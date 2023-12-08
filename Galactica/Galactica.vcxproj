@@ -569,6 +569,8 @@
     <ClInclude Include="src\Galactica\Animation\Animator.h" />
     <ClInclude Include="src\Galactica\Animation\AssimpToGLM.h" />
     <ClInclude Include="src\Galactica\Animation\Bone.h" />
+    <ClInclude Include="src\Galactica\Animation\Movement.h" />
+    <ClInclude Include="src\Galactica\Animation\StepTimer.h" />
     <ClInclude Include="src\Galactica\Application.h" />
     <ClInclude Include="src\Galactica\Core.h" />
     <ClInclude Include="src\Galactica\Core\Input.h" />
@@ -593,6 +595,7 @@
     <ClInclude Include="src\Galactica\Math\MathHelper.h" />
     <ClInclude Include="src\Galactica\Math\Quaternion.h" />
     <ClInclude Include="src\Galactica\Math\Quaternion.inl" />
+    <ClInclude Include="src\Galactica\Math\Spline.h" />
     <ClInclude Include="src\Galactica\Math\VQS.h" />
     <ClInclude Include="src\Galactica\Math\Vec2.h" />
     <ClInclude Include="src\Galactica\Math\Vec2.inl" />
@@ -616,11 +619,13 @@
     <ClCompile Include="src\Galactica\Animation\Animation.cpp" />
     <ClCompile Include="src\Galactica\Animation\Animator.cpp" />
     <ClCompile Include="src\Galactica\Animation\Bone.cpp" />
+    <ClCompile Include="src\Galactica\Animation\Movement.cpp" />
     <ClCompile Include="src\Galactica\Application.cpp" />
     <ClCompile Include="src\Galactica\ImGui\ImGuiLayer.cpp" />
     <ClCompile Include="src\Galactica\Layer.cpp" />
     <ClCompile Include="src\Galactica\LayerStack.cpp" />
     <ClCompile Include="src\Galactica\Logger\Logger.cpp" />
+    <ClCompile Include="src\Galactica\Math\Spline.cpp" />
     <ClCompile Include="src\Galactica\Math\VQS.cpp" />
     <ClCompile Include="src\Galactica\Renderer\CameraControl.cpp" />
     <ClCompile Include="src\Galactica\Renderer\Line.cpp" />

@@ -54,6 +54,7 @@ namespace Galactica
 
 		void Bonelines(aiNode* node, BoneLine bone_lines);
 
+
 		std::vector<BoneLine> GetBoneLines();
 
 	private:

@@ -8,7 +8,8 @@ namespace Galactica
 	public:
 
 		Timestep(float time = 0.0f)
-			: m_Time(time)
+			:	m_Time(time),
+				m_TotalTime(time)
 		{
 		}
 
@@ -20,7 +21,11 @@ namespace Galactica
 
 		float GetMilliseconds() const { return m_Time * 1000.0f; }
 
+		float GetTotal() const { return m_TotalTime; }
+
 	private:
 		float m_Time;
+
+		float m_TotalTime;
 	};
 }

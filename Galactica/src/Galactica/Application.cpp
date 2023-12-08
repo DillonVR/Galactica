@@ -5,6 +5,7 @@
 
 #include <GLFW/glfw3.h>
 
+#include "Animation\StepTimer.h"
 #include "Galactica/Vendor/glm/glm/glm.hpp"
 
 #include "Galactica/Vendor/stb_image/stb_image.h"
@@ -40,6 +41,7 @@ namespace Galactica {
 		stbi_set_flip_vertically_on_load(true);
 		glEnable(GL_DEPTH_TEST);
 
+
 		while (m_Running)
 		{
 			glClearColor(1.0, 1.0, 1.0, 1);
@@ -49,19 +51,7 @@ namespace Galactica {
 			Timestep timestep = time - m_LastFrameTime;
 			m_LastFrameTime = time;
 
-			for (Layer* layer : m_LayerStack)
-			{
-				layer->OnUpdate(timestep);
-			}
-
-			m_imGUILayer->Begin();
-			for (Layer* layer : m_LayerStack)
-			{
-				layer->OnImGuiRender();
-			}
-			m_imGUILayer->End();
-
-			m_Window->OnUpdate();
+			Tick();
 
 		}
 	}
@@ -92,6 +82,32 @@ namespace Galactica {
 	{
 		m_LayerStack.PushOverLayer(layer);
 		layer->OnAttach();
+	}
+
+	void Application::Tick()
+	{
+		m_timer.Tick([&]()
+			{
+				Update(m_timer);
+			});
+
+		m_Window->OnUpdate();
+	}
+
+	void Application::Update(Galactica::StepTimer const& timer)
+	{
+		for (Layer* layer : m_LayerStack)
+		{
+			layer->OnUpdate(timer);
+		}
+
+		m_imGUILayer->Begin();
+		for (Layer* layer : m_LayerStack)
+		{
+			layer->OnImGuiRender();
+		}
+		m_imGUILayer->End();
+		
 	}
 
 	bool Application::OnWindowClose(WindowCloseEvent& e)
