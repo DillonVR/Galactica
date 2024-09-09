@@ -2,10 +2,10 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>C:\Users\Dillo\source\repos\DillonVR\Galactica\bin\Debug-windows-x86_64\Galactica\Galactica.dll</FullPath>
+      <FullPath>C:\Users\Dillo\source\repos\Galactica\bin\Debug-windows-x86_64\Galactica\Galactica.dll</FullPath>
     </ProjectOutput>
     <ProjectOutput>
-      <FullPath>C:\Users\Dillo\source\repos\DillonVR\Galactica\bin\Debug-windows-x86_64\Sandbox\Sandbox.exe</FullPath>
+      <FullPath>C:\Users\Dillo\source\repos\Galactica\bin\Debug-windows-x86_64\Sandbox\Sandbox.exe</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles />

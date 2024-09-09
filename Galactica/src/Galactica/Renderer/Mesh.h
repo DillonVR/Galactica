@@ -41,6 +41,8 @@ namespace Galactica{
 
 		void lineMesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices);
 
+		void TexturedMesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, const std::vector<Texture>& textures);
+
 		//void lineBone(const std::vector<Galactica::BoneLine>& vertices);
 
 		void DebugMode(bool set);

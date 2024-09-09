@@ -26,8 +26,9 @@ public:
 	bool showSkin = true;
 	bool debugMode = false;
 	bool animate = false;
-	bool showPath = true;
+	bool showPath = false;
 	bool runPath = false;
+	bool movementOnPath = false;
 
 	bool flag = false;
 

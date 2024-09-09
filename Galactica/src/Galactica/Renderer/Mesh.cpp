@@ -24,6 +24,15 @@ namespace Galactica
         InitMesh();
 	}
 
+    void Mesh::TexturedMesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, const std::vector<Texture>& textures)
+    {
+        this->vertices = vertices;
+        this->indices = indices;
+        this->textures = textures;
+
+        InitMesh();
+    }
+
 	void Mesh::DebugMode(bool set)
 	{
         if (set == true)

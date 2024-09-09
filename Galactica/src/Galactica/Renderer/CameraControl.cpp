@@ -92,9 +92,9 @@ namespace Galactica
 	void CameraControl::SetViewportSize(float width, float height)
 	{
 		cameraViewportWidth = width;
-		printf("\nwidth %f", cameraViewportWidth);
+		//printf("\nwidth %f", cameraViewportWidth);
 		cameraViewportHeight = height;
-		printf("\nheight %f", cameraViewportHeight);
+		//printf("\nheight %f", cameraViewportHeight);
 		 
 	}
 
@@ -162,7 +162,7 @@ namespace Galactica
 	void CameraControl::MouseZoom(float delta)
 	{
 		cameraDistance -= delta * ZoomSpeed();
-		printf("delta = %f",cameraDistance);
+		//printf("delta = %f",cameraDistance);
 		if (cameraDistance < 1.0f)
 		{
 			cameraFocalPoint += GetForwardDirection();
@@ -207,8 +207,8 @@ namespace Galactica
 	{
 
 		SetViewportSize(static_cast<float>(e.GetWidth()), static_cast<float>(e.GetHeight()));
-		printf("\nWindow Width %d",e.GetWidth());
-		printf("\nWindow Height %d", e.GetHeight());
+		//printf("\nWindow Width %d",e.GetWidth());
+		//printf("\nWindow Height %d", e.GetHeight());
 		return false;
 	}
 }
