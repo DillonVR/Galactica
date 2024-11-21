@@ -49,10 +49,11 @@
 	}
 
 	//int floor mesh
+
 	Galactica::Texture floorTexture;
-	floorTexture.id = 1;
-	floorTexture.path = "assets/Materials/wood.png";
-	floorTexture.type = "floor";
+	floorTexture.id = 2;
+	floorTexture.path = "assets/Materials/Floor.jpg";
+	floorTexture.type = "texture_diffuse";
 
 	textures.push_back(floorTexture);
 	
@@ -97,8 +98,6 @@
 		{
 			animator.UpdateAnimation(ts, path.m_NormalizedTime, 1);
 		}
-
-		
 
 		const glm::mat4 projection = camera.GetViewProjection();
 

@@ -35,7 +35,7 @@ namespace Galactica
 		std::vector<Texture> textureLoaded;
 		std::vector<Mesh> meshes;
 		std::string directory;
-		std::map<std::string, BoneInfo> boneMap;
+		std::unordered_map<std::string, BoneInfo> boneMap;
 		std::vector<BoneLine> boneLines;
 
 		int boneNum = 0;
@@ -48,7 +48,7 @@ namespace Galactica
 
 		void LoadModel(std::string const& path, bool gamma);
 
-		auto& GetBoneMap() { return boneMap; }
+		std::unordered_map<std::string, BoneInfo> GetBoneMap() { return boneMap; }
 
 		int& GetBoneCount() { return boneNum; }
 

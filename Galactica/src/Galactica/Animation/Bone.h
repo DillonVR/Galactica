@@ -39,7 +39,11 @@ namespace Galactica
 
 		glm::mat4 getLocalTransform() const;
 
+		void setLocalTransform(const glm::mat4& newTransform);
+
 		const VQS& GetLocalVQS() const;
+
+		void SetLocalVQS(const VQS& newVQS);
 
 		std::string GetBoneName() const;
 

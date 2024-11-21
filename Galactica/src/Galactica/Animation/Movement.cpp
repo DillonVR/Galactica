@@ -161,15 +161,15 @@ namespace Galactica
 
 	void Movement::ComputeTable()
 	{
-		m_StartingPoints.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
-		m_StartingPoints.push_back(glm::vec3(0.1f, 0.0f, 0.0f));
-		m_StartingPoints.push_back(glm::vec3(-7.0f, 0.0f, -7.0f));
-		m_StartingPoints.push_back(glm::vec3(-7.0f, 0.0f, 7.0f));
-		m_StartingPoints.push_back(glm::vec3(7.0f, 0.0f, 7.0f));
-		m_StartingPoints.push_back(glm::vec3(3.0f, 0.0f, 13.0f));
-		m_StartingPoints.push_back(glm::vec3(7.0f, 0.0f, -7.0f));
-		m_StartingPoints.push_back(glm::vec3(0.1f, 0.0f, 0.0f));
-		m_StartingPoints.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
+		m_StartingPoints.push_back(glm::vec3(0.0f, 0.1f, 0.0f));
+		m_StartingPoints.push_back(glm::vec3(0.1f, 0.1f, 0.0f));
+		m_StartingPoints.push_back(glm::vec3(-7.0f, 0.1f, -7.0f));
+		m_StartingPoints.push_back(glm::vec3(-7.0f, 0.1f, 7.0f));
+		m_StartingPoints.push_back(glm::vec3(7.0f, 0.1f, 7.0f));
+		m_StartingPoints.push_back(glm::vec3(3.0f, 0.1f, 13.0f));
+		m_StartingPoints.push_back(glm::vec3(7.0f, 0.1f, -7.0f));
+		m_StartingPoints.push_back(glm::vec3(0.1f, 0.1f, 0.0f));
+		m_StartingPoints.push_back(glm::vec3(0.0f, 0.1f, 0.0f));
 
 		//Calculate control points using starting points
 		for (auto i = 1; i < m_StartingPoints.size() - 1; ++i)

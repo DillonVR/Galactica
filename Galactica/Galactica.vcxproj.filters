@@ -1455,6 +1455,9 @@
     <ClInclude Include="src\glpch.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>src\Galactica\Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Vendor\stb_image\stb_image.cpp">

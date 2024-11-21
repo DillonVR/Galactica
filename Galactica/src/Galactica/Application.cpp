@@ -41,10 +41,9 @@ namespace Galactica {
 		stbi_set_flip_vertically_on_load(true);
 		glEnable(GL_DEPTH_TEST);
 
-
 		while (m_Running)
 		{
-			glClearColor(1.0, 1.0, 1.0, 1);
+			glClearColor(0.1, 0.5, 0.8, 1);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 			float time = Timestep::GetTime();

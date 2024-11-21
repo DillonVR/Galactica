@@ -60,6 +60,7 @@ namespace Galactica{
         unsigned int EBO;
 
         void InitMesh();
+		void InitTexture2DMesh();
 	};
 }
 

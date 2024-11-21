@@ -35,7 +35,7 @@ namespace Galactica
 
 		const AssimpNodeData& GetRootNode() { return rootNode; }
 
-		const std::map<std::string, BoneInfo>& GetBoneIDMap()
+		const std::unordered_map<std::string, BoneInfo>& GetBoneIDMap()
 		{
 			return boneInfoMap;
 		}
@@ -54,7 +54,7 @@ namespace Galactica
 
 		AssimpNodeData rootNode;
 
-		std::map<std::string, BoneInfo> boneInfoMap;
+		std::unordered_map<std::string, BoneInfo> boneInfoMap;
 
 	};
 

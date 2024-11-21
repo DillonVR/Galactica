@@ -70,6 +70,16 @@ namespace Galactica
 		return localTransform;
 	}
 
+	void Bone::setLocalTransform(const glm::mat4& newTransform)
+	{
+		localTransform = newTransform;
+	}
+
+	void Bone::SetLocalVQS(const VQS& newVQS)
+	{
+		localVQS = newVQS;
+	}
+
 	const VQS& Bone::GetLocalVQS() const
 	{
 		return localVQS;

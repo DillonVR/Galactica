@@ -20,6 +20,14 @@ namespace Galactica
 
 		void CalcBoneTransformationVQS(const AssimpNodeData* node, VQS parentTransform);
 
+		void SetupIK(std::string const& effector);
+
+		void ResetIK();
+
+		void SolveCCDIK(glm::vec3 const& target, float deltatime);
+
+		void SolveFABRIK(glm::vec3 const& target, float deltatime);
+
 		std::vector<glm::mat4> GetFinalBoneMatrices();
 
 		std::vector<glm::vec3> debugBone;
@@ -35,6 +43,17 @@ namespace Galactica
 		float currentTime;
 
 		float deltaTime;
+
+		unsigned int counter;
+
+		std::vector<std::shared_ptr<AssimpNodeData>> manipulators;
+
+		std::vector<std::tuple<uint32_t, glm::vec3>> bonePositions;
+
+		std::vector<glm::vec2> constraints;
+
+		std::vector<float> angleRotated;
+
 
 	};
 }
