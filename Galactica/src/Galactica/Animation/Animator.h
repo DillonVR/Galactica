@@ -20,6 +20,8 @@ namespace Galactica
 
 		void CalcBoneTransformationVQS(const AssimpNodeData* node, VQS parentTransform);
 
+		void CalcBoneTransformationIK(const AssimpNodeData* node, VQS parentTransform, bool ik);
+
 		void SetupIK(std::string const& effector);
 
 		void ResetIK();
@@ -46,7 +48,7 @@ namespace Galactica
 
 		unsigned int counter;
 
-		std::vector<std::shared_ptr<AssimpNodeData>> manipulators;
+		std::vector<AssimpNodeData*> manipulators;
 
 		std::vector<std::tuple<uint32_t, glm::vec3>> bonePositions;
 

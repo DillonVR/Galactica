@@ -40,6 +40,10 @@ namespace Galactica
 			return boneInfoMap;
 		}
 
+		std::vector<AssimpNodeData*> GetManipulators(std::string const& endEffeactor);
+
+		AssimpNodeData* GetNodeData(std::string const& nodeName);
+
 	private:
 
 		void ReadMissingBones(const aiAnimation* animation, Model& model);

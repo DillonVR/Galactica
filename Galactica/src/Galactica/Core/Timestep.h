@@ -13,7 +13,7 @@ namespace Galactica
 		{
 		}
 
-		static float GetTime() { return glfwGetTime(); }
+		static float GetTime() { return static_cast<float>(glfwGetTime()); }
 
 		operator float() const { return m_Time; }
 

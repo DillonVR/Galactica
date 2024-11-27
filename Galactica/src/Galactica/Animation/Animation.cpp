@@ -4,6 +4,7 @@
 
 #include "AssimpToGLM.h"
 #include "assimp/postprocess.h"
+#include <queue>
 
 namespace Galactica
 {
@@ -18,9 +19,9 @@ namespace Galactica
 
 		const auto animation = scene->mAnimations[0];
 
-		duration = animation->mDuration;
+		duration = static_cast<float>(animation->mDuration);
 
-		ticksPerSecond = animation->mTicksPerSecond;
+		ticksPerSecond = static_cast<int>(animation->mTicksPerSecond);
 
 		ReadHeirarchyData(rootNode, scene->mRootNode);
 		ReadMissingBones(animation, *model);
@@ -48,6 +49,46 @@ namespace Galactica
 	}
 
 	
+	std::vector<AssimpNodeData*> Animation::GetManipulators(std::string const& endEffeactor)
+	{
+		AssimpNodeData* manipulator = GetNodeData(endEffeactor);
+
+		std::vector<AssimpNodeData*> maniplutors;
+		while (manipulator->name != "mixamorig1_Spine2")
+		{
+			maniplutors.push_back(manipulator);
+			manipulator = manipulator->parent;
+		}
+
+		return maniplutors;
+	}
+
+	AssimpNodeData* Animation::GetNodeData(std::string const& nodeName)
+	{
+		std::queue<AssimpNodeData*> boneNodes{};
+		boneNodes.push(&rootNode);
+
+		while (!boneNodes.empty()) 
+		{
+			for (unsigned int i = 0; i < boneNodes.size(); ++i)
+			{
+				auto currentNode = boneNodes.front();
+				boneNodes.pop();
+
+				if (currentNode->name == nodeName)
+				{
+					return currentNode;
+				}
+
+				for (auto child : currentNode->children)
+				{
+					boneNodes.push(&child);
+				}
+			}
+		}
+		return nullptr;
+	}
+
 	void Animation::ReadMissingBones(const aiAnimation* animation, Model& model)
 	{
 		int size = animation->mNumChannels;
@@ -82,7 +123,7 @@ namespace Galactica
 		dest.transformation = AssimpToGLMH::ConvertMatrixToGLMFormat(src->mTransformation);
 		dest.childNum = src->mNumChildren;
 
-		for (int i = 0; i < src->mNumChildren; i++)
+		for (unsigned int i = 0; i < src->mNumChildren; i++)
 		{
 			AssimpNodeData newData;
 			newData.parent = &dest;

@@ -64,6 +64,8 @@
 	GL_LOGGER_INFO("Loading model Solider");
 
 	ourModel.LoadModel("assets/Soldier/Soldier.dae", false);
+	GL_LOGGER_INFO("Setting UP IK");
+	animator.SetupIK("mixamorig1_LeftHandIndex1");
 
 	GL_LOGGER_INFO("Loading model done");
 
@@ -96,6 +98,7 @@
 		}
 		else
 		{
+			animator.SolveCCDIK(glm::vec3(0.0, 0.0, 0.0), ts);
 			animator.UpdateAnimation(ts, path.m_NormalizedTime, 1);
 		}
 
