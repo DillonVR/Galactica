@@ -14,7 +14,7 @@ namespace Galactica
 
 		void Play(Animation* pAnimation);
 
-		void CalcBoneTransformation(const AssimpNodeData* node, glm::mat4 parentTransform);
+		void CalcBoneTransformation(const AssimpNodeData* node, glm::mat4 parentTransform,bool ik);
 
 		void CalcBlendTranformation(float animationTime, std::vector<glm::mat4>& Transfomation, unsigned int startAnimation, unsigned int endAnimation, float blendFactor);
 

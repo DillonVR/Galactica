@@ -28,7 +28,8 @@ namespace Galactica
 		{
 			m_V0 = 2.0f / (1.0f - m_T1 + m_T2);
 
-			ComputeTable();
+			GenerateDefultPath();
+			//ComputeTable();
 		}
 
 		glm::vec3 InterpolationFunc(float u,
@@ -51,7 +52,12 @@ namespace Galactica
 
 		float m_SpeedFactor; //[0, 1] & 1 = full velocity
 
-		void ComputeTable();
+		void GenerateDefultPath();
+
+		void GenerateNewPath(glm::vec3 target, glm::vec3 position);
+
+		void ComputeTable(std::vector<glm::vec3> path);
+
 	private:
 		float GetDistanceFromTime(float time);
 

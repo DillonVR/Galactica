@@ -15,7 +15,6 @@ namespace Galactica
 		int childNum;
 		std::vector<AssimpNodeData> children;
 		AssimpNodeData* parent;
-
 	};
 
 	class GALACTICA_API Animation
@@ -33,7 +32,7 @@ namespace Galactica
 
 		float GetDuration() { return duration; }
 
-		const AssimpNodeData& GetRootNode() { return rootNode; }
+		const AssimpNodeData* GetRootNode() { return rootNode; }
 
 		const std::unordered_map<std::string, BoneInfo>& GetBoneIDMap()
 		{
@@ -48,7 +47,7 @@ namespace Galactica
 
 		void ReadMissingBones(const aiAnimation* animation, Model& model);
 
-		void ReadHeirarchyData(AssimpNodeData& dest, const aiNode* src);
+		void ReadHeirarchyData(AssimpNodeData* dest, const aiNode* src);
 
 		float duration;
 
@@ -56,7 +55,7 @@ namespace Galactica
 
 		std::vector<Bone> bones;
 
-		AssimpNodeData rootNode;
+		AssimpNodeData* rootNode;
 
 		std::unordered_map<std::string, BoneInfo> boneInfoMap;
 

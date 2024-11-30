@@ -23,6 +23,8 @@ namespace Galactica
 
 		ticksPerSecond = static_cast<int>(animation->mTicksPerSecond);
 
+		rootNode = new AssimpNodeData();
+
 		ReadHeirarchyData(rootNode, scene->mRootNode);
 		ReadMissingBones(animation, *model);
 	}
@@ -51,10 +53,16 @@ namespace Galactica
 	
 	std::vector<AssimpNodeData*> Animation::GetManipulators(std::string const& endEffeactor)
 	{
-		AssimpNodeData* manipulator = GetNodeData(endEffeactor);
-
+		auto manipulator = GetNodeData(endEffeactor);
 		std::vector<AssimpNodeData*> maniplutors;
-		while (manipulator->name != "mixamorig1_Spine2")
+
+		if (manipulator == nullptr)
+		{
+			Logger::Err("FAILED TO SET UP IK");
+			return maniplutors;
+		}
+
+		while (manipulator->name != "mixamorig_Spine2")
 		{
 			maniplutors.push_back(manipulator);
 			manipulator = manipulator->parent;
@@ -66,25 +74,24 @@ namespace Galactica
 	AssimpNodeData* Animation::GetNodeData(std::string const& nodeName)
 	{
 		std::queue<AssimpNodeData*> boneNodes{};
-		boneNodes.push(&rootNode);
+		boneNodes.push(rootNode);
+		AssimpNodeData* currentNode;
 
 		while (!boneNodes.empty()) 
 		{
-			for (unsigned int i = 0; i < boneNodes.size(); ++i)
+			currentNode = boneNodes.front();
+			boneNodes.pop();
+
+			if (currentNode->name == nodeName)
 			{
-				auto currentNode = boneNodes.front();
-				boneNodes.pop();
-
-				if (currentNode->name == nodeName)
-				{
-					return currentNode;
-				}
-
-				for (auto child : currentNode->children)
-				{
-					boneNodes.push(&child);
-				}
+				return currentNode;
 			}
+
+			for (AssimpNodeData& child : currentNode->children)
+			{
+				boneNodes.push(&child);
+			}
+			
 		}
 		return nullptr;
 	}
@@ -115,20 +122,25 @@ namespace Galactica
 	}
 
 	// Read in Heirarchy
-	void Animation::ReadHeirarchyData(AssimpNodeData& dest, const aiNode* src)
+	void Animation::ReadHeirarchyData(AssimpNodeData* dest, const aiNode* src)
 	{
 		GL_ASSERT(src);
 
-		dest.name = src->mName.data;
-		dest.transformation = AssimpToGLMH::ConvertMatrixToGLMFormat(src->mTransformation);
-		dest.childNum = src->mNumChildren;
-
+		dest->name = src->mName.data;
+		dest->transformation = AssimpToGLMH::ConvertMatrixToGLMFormat(src->mTransformation);
+		dest->childNum = src->mNumChildren;
+		
 		for (unsigned int i = 0; i < src->mNumChildren; i++)
 		{
-			AssimpNodeData newData;
+			AssimpNodeData* newData = new AssimpNodeData();
+			newData->parent = dest;
+			ReadHeirarchyData(newData, src->mChildren[i]);
+			dest->children.push_back(*newData);
+
+			/*AssimpNodeData newData;
 			newData.parent = &dest;
 			ReadHeirarchyData(newData, src->mChildren[i]);
-			dest.children.push_back(newData);
+			dest.children.push_back(newData);*/
 		}
 	}
 }

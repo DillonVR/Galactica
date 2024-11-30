@@ -36,6 +36,12 @@ namespace Galactica
 	{
 	}
 
+	template<typename T>
+	inline Quaternion<T>::Quaternion(const glm::quat& q)
+		: x(q.x), y(q.y), z(q.z), w(q.w)
+	{
+	}
+
 	template <typename T>
 	T Quaternion<T>::Norm() const
 	{

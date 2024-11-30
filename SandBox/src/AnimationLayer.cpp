@@ -64,8 +64,9 @@
 	GL_LOGGER_INFO("Loading model Solider");
 
 	ourModel.LoadModel("assets/Soldier/Soldier.dae", false);
+	backpackModel.LoadModel("assets/backpack/backpack.obj",false);
 	GL_LOGGER_INFO("Setting UP IK");
-	animator.SetupIK("mixamorig1_LeftHandIndex1");
+	
 
 	GL_LOGGER_INFO("Loading model done");
 
@@ -79,6 +80,8 @@
 	running.LoadAnimation("assets/Animations/Running.dae", &ourModel);
 
 	animator.Play(&idle);
+
+	animator.SetupIK("mixamorig_LeftHandIndex1");
 	GL_LOGGER_INFO("done");
 }
 
@@ -88,7 +91,7 @@
 		float ts = static_cast<float> (timer.GetElapsedSeconds());
 
 		camera.OnUpdate(ts);
-		glm::mat4 movement;
+		
 
 		//get the translation and rotation
 		if(movementOnPath)
@@ -96,9 +99,14 @@
 			movement = path.Update(timer);
 			animator.UpdateAnimation(ts, path.m_NormalizedTime, path.m_SpeedFactor);
 		}
+		else if(IK)
+		{
+			//animator.UpdateAnimation(ts, path.m_NormalizedTime, 1);
+			animator.Play(&Walking);
+			animator.SolveCCDIK(targetPos, ts);
+		}
 		else
 		{
-			animator.SolveCCDIK(glm::vec3(0.0, 0.0, 0.0), ts);
 			animator.UpdateAnimation(ts, path.m_NormalizedTime, 1);
 		}
 
@@ -179,8 +187,16 @@
 		float floorColor = 1.0f;
 
 		//floormesh.DebugMode(true);
+		ModelShader.setFloat("objectcolor", 0.1f);
 		ModelShader.setMat4("model", floor);
 		floormesh.DrawMesh(ModelShader);
+
+		auto bag = glm::mat4(1.0f);
+		bag = glm::translate(bag, targetPos);
+		bag = glm::scale(bag, glm::vec3(0.2f, 0.2f,0.2f));
+		ModelShader.setFloat("objectcolor", 1.0f);
+		ModelShader.setMat4("model", bag);
+		backpackModel.DrawModel(ModelShader);
 
 		//Draw debug
 
@@ -195,7 +211,7 @@
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
 		ImGui::Text("Animations");
 
-		const char* items[] = {"Idle","Walking","Running","Running On Path"};
+		const char* items[] = {"Idle","Walking","Running","Running On Path","IK"};
 		static int item_current_idx = 0; 
 		static int item_last_idx = 0;
 		
@@ -217,6 +233,7 @@
 				{
 					animator.Play(&idle);
 					movementOnPath = false;
+					IK = false;
 					flag = false;
 				}
 
@@ -224,6 +241,7 @@
 				{
 					animator.Play(&Walking);
 					movementOnPath = false;
+					IK = false;
 					flag = false;
 				}
 
@@ -231,12 +249,21 @@
 				{
 					animator.Play(&running);
 					movementOnPath = false;
+					IK = false;
 					flag = false;
 				}
 				if (item_current_idx == 3 && flag == true)
 				{
 					animator.Play(&running);
 					movementOnPath = true;
+					IK = false;
+					flag = false;
+				}
+				if (item_current_idx == 4 && flag == true)
+				{
+					animator.Play(&Walking);
+					movementOnPath = false;
+					IK = true;
 					flag = false;
 				}
 
@@ -255,7 +282,15 @@
 		ImGui::Checkbox("Path", &showPath);
 		ImGui::Text("Velocity : %f", path.m_SpeedFactor);
 
+		if (ImGui::Button("Set Target path"))
+		{
+			//path.GenerateNewPath(targetPos,movement)
+		}
+
 		ImGui::Checkbox("Debug", &debugMode);
+
+		ImGui::SliderFloat("X", &targetPos.x, -5.0f, 5.0f);
+		ImGui::SliderFloat("Z", &targetPos.z, -5.0f, 5.0f);
 		
 		ImGui::End();
 	}

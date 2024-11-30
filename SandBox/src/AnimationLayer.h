@@ -29,6 +29,10 @@ public:
 	bool showPath = false;
 	bool runPath = false;
 	bool movementOnPath = false;
+	bool IK = false;
+	glm::vec3 targetPos = { 1.0, 1.0, 1.0 };
+	glm::mat4 movement;
+
 
 	bool flag = false;
 

@@ -1,8 +1,12 @@
 ﻿#pragma once
 
+
+
 #include  "Vec3.h"
 #include  "Vec4.h"
 #include "Mat3.h"
+#include "Galactica/Vendor/glm/glm/glm.hpp"
+#include "Galactica/Vendor/glm/glm/gtc/quaternion.hpp"
 
 namespace Galactica
 {
@@ -35,6 +39,8 @@ namespace Galactica
 		Quaternion(const Vec3<T>& unitVector, const T angleInDegrees);
 
 		Quaternion(const Quaternion<T>& quaternion);
+
+		Quaternion(const glm::quat& q);
 
 		~Quaternion() = default;
 

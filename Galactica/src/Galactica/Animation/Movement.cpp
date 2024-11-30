@@ -23,6 +23,27 @@ namespace Galactica
 		
 	}
 
+	void Movement::GenerateNewPath(glm::vec3 target, glm::vec3 position)
+	{
+		 
+		target.y = 0.0f;
+		glm::vec3 dir = target - position;
+		dir = glm::normalize(dir);
+
+		float totalDistance = glm::distance(target, position);
+		float segmentsDistance = totalDistance / 8.0f;
+
+		std::vector<glm::vec3> newPath;
+		newPath.push_back(glm::vec3{ position + (dir * (-segmentsDistance)) });
+
+		for (unsigned int i = 0; i <= 8; ++i)
+		{
+			newPath.push_back(glm::vec3{ position + (dir * (i* segmentsDistance)) });
+		}
+
+		ComputeTable(newPath);
+	}
+
 	glm::mat4 Movement::Update(Galactica::StepTimer timer)
 	{
 
@@ -159,7 +180,7 @@ namespace Galactica
 		
 	}
 
-	void Movement::ComputeTable()
+	void Movement::GenerateDefultPath()
 	{
 		m_StartingPoints.push_back(glm::vec3(0.0f, 0.1f, 0.0f));
 		m_StartingPoints.push_back(glm::vec3(0.1f, 0.1f, 0.0f));
@@ -170,6 +191,14 @@ namespace Galactica
 		m_StartingPoints.push_back(glm::vec3(7.0f, 0.1f, -7.0f));
 		m_StartingPoints.push_back(glm::vec3(0.1f, 0.1f, 0.0f));
 		m_StartingPoints.push_back(glm::vec3(0.0f, 0.1f, 0.0f));
+
+		ComputeTable(m_StartingPoints);
+	}
+
+	
+	void Movement::ComputeTable(std::vector<glm::vec3> path)
+	{
+		
 
 		//Calculate control points using starting points
 		for (auto i = 1; i < m_StartingPoints.size() - 1; ++i)
@@ -279,4 +308,7 @@ namespace Galactica
 		}
 
 	}
+
 }
+
+
