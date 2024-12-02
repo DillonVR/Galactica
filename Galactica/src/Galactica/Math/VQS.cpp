@@ -111,6 +111,26 @@ namespace Galactica
 		};
 	}
 
+	glm::vec3 VQS::operator*(const glm::vec3& vec) const
+	{
+		// Apply scaling
+		glm::vec3 scaledVec = scalingVector * vec;
+
+		// Convert scaledVec to quaternion 
+		QuatFloat scaledVecQuat(0.0f, scaledVec.x, scaledVec.y, scaledVec.z);
+
+		// Apply rotation using quaternion 
+		QuatFloat rotatedVecQuat = quatRotation * scaledVecQuat * quatRotation.GetInverse(); 
+
+		//Convert rotated quaternion back to vector 
+		glm::vec3 rotatedVec(rotatedVecQuat.x, rotatedVecQuat.y, rotatedVecQuat.z);
+
+		// Apply translation 
+		glm::vec3 result = rotatedVec + translationVector;
+
+		return result;
+	}
+
 	void VQS::MakeInverse()
 	{
 		const auto scaledTranslationInverse = (1.0f / this->scalingVector) * (this->translationVector * -1.0f);

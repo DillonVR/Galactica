@@ -47,6 +47,7 @@ namespace Galactica
 		VQS& operator*(float value);
 		VQS& operator*=(const VQS& vqs);
 		VQS operator*(const VQS& vqs) const;
+		glm::vec3 operator*(const glm::vec3& vec) const;
 
 		friend VQS operator*(const VQS& vqs, float value)
 		{

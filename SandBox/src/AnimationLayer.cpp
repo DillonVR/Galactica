@@ -284,7 +284,7 @@
 
 		if (ImGui::Button("Set Target path"))
 		{
-			//path.GenerateNewPath(targetPos,movement)
+			animator.ResetIK();
 		}
 
 		ImGui::Checkbox("Debug", &debugMode);
