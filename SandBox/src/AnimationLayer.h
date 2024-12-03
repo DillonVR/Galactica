@@ -22,16 +22,16 @@ public:
 	std::vector<Galactica::Texture> textures;
 	std::vector<Galactica::BoneLine> skelly;
 
-	bool showBones = false;
-	bool showSkin = true;
+	bool showBones = true;
+	bool showSkin = false;
 	bool debugMode = false;
 	bool animate = false;
 	bool showPath = false;
 	bool runPath = false;
 	bool movementOnPath = false;
 	bool IK = false;
-	glm::vec3 targetPos = { 1.0, 1.0, 1.0 };
-	glm::mat4 movement;
+	glm::vec3 targetPos = { 4.0, 1.0, -4.0 };
+	glm::mat4 movement{0};
 
 
 	bool flag = false;

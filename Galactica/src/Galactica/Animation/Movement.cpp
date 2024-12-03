@@ -25,6 +25,11 @@ namespace Galactica
 
 	void Movement::GenerateNewPath(glm::vec3 target, glm::vec3 position)
 	{
+		m_ControlPoints.clear();
+		m_PlotPoints.clear();
+		m_FinalTable.clear();
+
+		m_TravelDuration = 5.0f;
 		 
 		target.y = 0.0f;
 		glm::vec3 dir = target - position;
@@ -46,69 +51,87 @@ namespace Galactica
 
 	glm::mat4 Movement::Update(Galactica::StepTimer timer)
 	{
+		
+		if (reset)
+		{
+			Restart(timer);
+			reset = false;
+		}
 
-		//for slidding/skidding
+		//for sliding/skidding
 		float velocity = GetVelocity(m_NormalizedTime);
 
 		m_SpeedFactor = velocity / m_V0;
 
-		
 		//t in [0, 1]
-		m_NormalizedTime = (timer.GetTotalSeconds() - m_TravelBeginTime) / m_TravelDuration;
+		m_NormalizedTime = (static_cast<float>(timer.GetTotalSeconds()) - m_TravelBeginTime) / m_TravelDuration;
 
-		//get distance based on t
-		float dist = GetDistanceFromTime(m_NormalizedTime);
+		if (m_NormalizedTime < 1.0f)
+		{
+			path_completed = false;
+			//get distance based on t
+			float dist = GetDistanceFromTime(m_NormalizedTime);
 
-		//get u based on distance
-		float u;
-		int entryIndex;
-		GetUFromDistance(dist, u, entryIndex);
+			//get u based on distance
+			float u;
+			int entryIndex;
+			GetUFromDistance(dist, u, entryIndex);
 
-		// convert u from [0,1] to [0, n] where n = number of segments
-		u *= m_LastTableEntry.u;
+			// convert u from [0,1] to [0, n] where n = number of segments
+			u *= m_LastTableEntry.u;
 
-		auto entriesPerSegment = m_FinalTable.size() / (m_StartingPoints.size() - 3);
+			auto entriesPerSegment = m_FinalTable.size() / (m_StartingPoints.size() - 3);
 
-		// convert u to [0, 1] for this particular segment
-		u -= (entryIndex / entriesPerSegment);
+			// convert u to [0, 1] for this particular segment
+			u -= (entryIndex / entriesPerSegment);
 
 
-		// find the index for control points in this segment
-		int index = (entryIndex / entriesPerSegment) * 3 + 1;
-		auto P0 = m_ControlPoints[index];
-		auto P1 = m_ControlPoints[index + 1];
-		auto P2 = m_ControlPoints[index + 2];
-		auto P3 = m_ControlPoints[index + 3];
+			// find the index for control points in this segment
+			int index = (entryIndex / static_cast<int>(entriesPerSegment)) * 3 + 1;
+			auto P0 = m_ControlPoints[index];
+			auto P1 = m_ControlPoints[index + 1];
+			auto P2 = m_ControlPoints[index + 2];
+			auto P3 = m_ControlPoints[index + 3];
 
-		auto position = InterpolationFunc(u, P0, P1, P2, P3);
+			auto position = InterpolationFunc(u, P0, P1, P2, P3);
 
-		//Calculate orientation 
-		auto deltaU = m_FinalTable[1].u - m_FinalTable[0].u;
-		auto W = InterpolationFunc(u + deltaU, P0, P1, P2, P3) - InterpolationFunc(u, P0, P1, P2, P3);
-		auto NW = normalize(W);
+			//Calculate orientation 
+			auto deltaU = m_FinalTable[1].u - m_FinalTable[0].u;
+			auto W = InterpolationFunc(u + deltaU, P0, P1, P2, P3) - InterpolationFunc(u, P0, P1, P2, P3);
+			auto NW = normalize(W);
 
-		glm::vec3 temp = glm::vec3(0, 1, 0);
-		auto U = cross(temp, NW);
-		auto V = cross(NW, U);
+			glm::vec3 temp = glm::vec3(0, 1, 0);
+			auto U = cross(temp, NW);
+			auto V = cross(NW, U);
 
 		float pi = 2 * acos(0);
 
-		glm::mat4 rotation = glm::mat4(
-			U.x, U.y, U.z, 0,
-			V.x, V.y, V.z, 0,
-			NW.x, NW.y, NW.z, 0,
-			0, 0, 0, 1) * glm::mat4(pi);
+			rotation = glm::mat4(
+				U.x, U.y, U.z, 0,
+				V.x, V.y, V.z, 0,
+				NW.x, NW.y, NW.z, 0,
+				0, 0, 0, 1) * glm::mat4(pi);
 
-		//loop
-		if (m_NormalizedTime > 1.0f)
+			//loop
+			if (m_NormalizedTime > 1.0f && loop)
+			{
+				Restart(timer);
+			}
+
+			translateMat = translate(glm::mat4(1.0f), glm::vec3(position.x, position.y, position.z));
+
+		}
+		else
 		{
-			m_TravelBeginTime = static_cast<float>(timer.GetTotalSeconds());
+			path_completed = true;
 		}
 
-		auto translateMat = translate(glm::mat4(1.0f), glm::vec3(position.x, position.y, position.z));
-
 		return translateMat * rotation;
-		
+	}
+
+	void Movement::Restart(Galactica::StepTimer timer)
+	{
+		m_TravelBeginTime = static_cast<float>(timer.GetTotalSeconds());
 	}
 
 	float Movement::GetDistanceFromTime(float time)
@@ -182,6 +205,9 @@ namespace Galactica
 
 	void Movement::GenerateDefultPath()
 	{
+		
+		m_StartingPoints.clear();
+
 		m_StartingPoints.push_back(glm::vec3(0.0f, 0.1f, 0.0f));
 		m_StartingPoints.push_back(glm::vec3(0.1f, 0.1f, 0.0f));
 		m_StartingPoints.push_back(glm::vec3(-7.0f, 0.1f, -7.0f));
@@ -198,21 +224,18 @@ namespace Galactica
 	
 	void Movement::ComputeTable(std::vector<glm::vec3> path)
 	{
-		
-
 		//Calculate control points using starting points
-		for (auto i = 1; i < m_StartingPoints.size() - 1; ++i)
+		for (auto i = 1; i < path.size() - 1; ++i)
 		{
-			auto a = m_StartingPoints[i] +
-				(m_StartingPoints[i + 1] - m_StartingPoints[i - 1]) / 8.0f;
+			auto a = path[i] +
+				(path[i + 1] - path[i - 1]) / 8.0f;
 
-			auto b = m_StartingPoints[i] -
-				(m_StartingPoints[i + 1] - m_StartingPoints[i - 1]) / 8.0f;
+			auto b = path[i] -
+				(path[i + 1] - path[i - 1]) / 8.0f;
 
 			m_ControlPoints.emplace_back(b);
-			m_ControlPoints.emplace_back(m_StartingPoints[i]);
+			m_ControlPoints.emplace_back(path[i]);
 			m_ControlPoints.emplace_back(a);
-
 		}
 
 		//A line is drawn between each plot point to draw the curve
@@ -220,10 +243,10 @@ namespace Galactica
 		for (auto i = 1; i < m_ControlPoints.size() - 3; i += 3)
 		{
 			//generate 100 points to draw a smooth curve using lines
-			for (auto j = 0; j < 100; ++j)
+			for (auto j = 0; j < 10; ++j)
 			{
 				//need a "u" in [0, 1] range 
-				float u = j / 99.0f;
+				float u = j / 9.0f;
 
 				glm::vec3 point = InterpolationFunc(u, m_ControlPoints[i], m_ControlPoints[i + 1], m_ControlPoints[i + 2], m_ControlPoints[i + 3]);
 

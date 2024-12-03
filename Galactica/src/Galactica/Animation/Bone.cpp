@@ -62,7 +62,8 @@ namespace Galactica
 		
 		auto result = translation * rotation * scale;
 
-		localVQS = GLMInternalHelper::ConvertGLMMatrixToVQS(result);
+
+		localTransform = result;// localVQS = GLMInternalHelper::ConvertGLMMatrixToVQS(result);
 	}
 
 	glm::mat4 Bone::getLocalTransform() const

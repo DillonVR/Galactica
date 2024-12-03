@@ -96,14 +96,27 @@
 		//get the translation and rotation
 		if(movementOnPath)
 		{
-			movement = path.Update(timer);
+			if(path.path_completed)
+			{
+				animator.Play(&idle);
+			}
+			else
+			{
+				movement = path.Update(timer);
+			}
 			animator.UpdateAnimation(ts, path.m_NormalizedTime, path.m_SpeedFactor);
 		}
 		else if(IK)
 		{
-			//animator.UpdateAnimation(ts, path.m_NormalizedTime, 1);
-			animator.Play(&Walking);
-			animator.SolveCCDIK(targetPos, ts);
+			if (path.path_completed)
+			{
+				animator.SolveCCDIK(targetPos, ts);
+			}
+			else
+			{
+				movement = path.Update(timer);
+				animator.UpdateAnimation(ts, path.m_NormalizedTime, path.m_SpeedFactor);
+			}
 		}
 		else
 		{
@@ -122,7 +135,7 @@
 
 		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
 
-		if (movementOnPath)
+		if (IK || movementOnPath)
 		{
 			model = movement;
 		}
@@ -161,7 +174,7 @@
 			auto debugBone = glm::mat4(1.0f);
 
 			debugBone = glm::scale(debugBone, glm::vec3(1.0f, 1.0f, 1.0f));
-			if (movementOnPath)
+			if (IK || movementOnPath)
 			{
 				debugBone = movement;
 			}
@@ -211,11 +224,11 @@
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
 		ImGui::Text("Animations");
 
-		const char* items[] = {"Idle","Walking","Running","Running On Path","IK"};
+		/*const char* items[] = {"Idle","Walking","Running"};
 		static int item_current_idx = 0; 
-		static int item_last_idx = 0;
+		static int item_last_idx = 0;*/
 		
-		if (ImGui::BeginListBox(" "))
+		/*if (ImGui::BeginListBox(" "))
 		{
 			if (item_current_idx != item_last_idx)
 			{
@@ -252,40 +265,44 @@
 					IK = false;
 					flag = false;
 				}
-				if (item_current_idx == 3 && flag == true)
-				{
-					animator.Play(&running);
-					movementOnPath = true;
-					IK = false;
-					flag = false;
-				}
-				if (item_current_idx == 4 && flag == true)
-				{
-					animator.Play(&Walking);
-					movementOnPath = false;
-					IK = true;
-					flag = false;
-				}
-
 				if (is_selected)
 					ImGui::SetItemDefaultFocus();
 
 			}
 			ImGui::EndListBox();
-		}
+		}*/
 		
 		ImGui::Checkbox("Bones", &showBones);
-		ImGui::Checkbox("Skin", &showSkin);
+		//ImGui::Checkbox("Skin", &showSkin);
 		
-		// ImGui::Checkbox("Movement", &movementOnPath);
-		
+	
+		if (ImGui::Button("Run on  Set path"))
+		{
+			animator.Play(&running);
+			/*path.GenerateDefultPath();*/
+			movementOnPath = true;
+			path.path_completed = false;
+			IK = false;
+			path.reset = true;
+		}
 		ImGui::Checkbox("Path", &showPath);
 		ImGui::Text("Velocity : %f", path.m_SpeedFactor);
+		ImGui::Text("Target : X( %f ) Y( %f ) Z( %f ) ", targetPos.x, targetPos.y, targetPos.z);
+		ImGui::Text("Player : X( %f ) Y( %f ) Z( %f ) ", movement[3][0], movement[3][1], movement[3][2]);
 
-		if (ImGui::Button("Set Target path"))
-		{
+
+		if (ImGui::Button("Set Target path for IK"))
+        {
+			IK = true;
+			animator.Play(&Walking);
+			path.GenerateNewPath(targetPos, glm::vec3(movement[3][0], movement[3][1], movement[3][2]));
 			animator.ResetIK();
-		}
+
+			movementOnPath = false;
+			path.path_completed = false;
+			path.reset = true;
+        }
+		
 
 		ImGui::Checkbox("Debug", &debugMode);
 

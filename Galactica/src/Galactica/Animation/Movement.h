@@ -58,6 +58,14 @@ namespace Galactica
 
 		void ComputeTable(std::vector<glm::vec3> path);
 
+		bool path_completed;
+
+		bool loop;
+
+		bool reset;
+
+		void Restart(Galactica::StepTimer timer);
+
 	private:
 		float GetDistanceFromTime(float time);
 
@@ -80,6 +88,9 @@ namespace Galactica
 		float m_TravelDuration; //total time it takes to travel on the path
 
 		float m_TravelBeginTime;
+
+		glm::mat4 translateMat;
+		glm::mat4 rotation;
 
 	};
 };
