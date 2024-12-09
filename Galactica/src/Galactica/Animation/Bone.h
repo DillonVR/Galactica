@@ -58,11 +58,11 @@ namespace Galactica
 	private:
 		static float GetScaleFactor(float lastTimeStamp, float nextTimeStamp, float animationTime);
 
-		// glm::mat4 InterpolatePos(float animationTime);
-		//
-		// glm::mat4 InterpolateRot(float animationTime);
-		//
-		// glm::mat4 InterpolateScale(float animationTime);
+		 glm::mat4 InterpolatePos(float animationTime);
+		
+		 glm::mat4 InterpolateRot(float animationTime);
+		
+		 glm::mat4 InterpolateScale(float animationTime);
 
 		glm::mat4 InterpolateVQSPos(float animationTime) const;
 		
@@ -91,9 +91,6 @@ namespace Galactica
 		glm::mat4 localTransform;
 
 		VQS localVQS;
-
-		Movement move;
-
 	};
 }
 

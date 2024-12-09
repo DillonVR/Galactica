@@ -13,8 +13,7 @@ namespace Galactica
 	Bone::Bone(const std::string& name, int ID, const aiNodeAnim* channel)
 		: name(name),
 		ID(ID),
-		localTransform(1.0f),
-		move(0)
+		localTransform(1.0f)
 	{
 		numPositions = channel->mNumPositionKeys;
 
@@ -62,8 +61,8 @@ namespace Galactica
 		
 		auto result = translation * rotation * scale;
 
-
-		localTransform = result;// localVQS = GLMInternalHelper::ConvertGLMMatrixToVQS(result);
+		localTransform = result;
+		localVQS = GLMInternalHelper::ConvertGLMMatrixToVQS(result);
 	}
 
 	glm::mat4 Bone::getLocalTransform() const

@@ -137,10 +137,6 @@ namespace Galactica
 			ReadHeirarchyData(newData, src->mChildren[i]);
 			dest->children.push_back(*newData);
 
-			/*AssimpNodeData newData;
-			newData.parent = &dest;
-			ReadHeirarchyData(newData, src->mChildren[i]);
-			dest.children.push_back(newData);*/
 		}
 	}
 }

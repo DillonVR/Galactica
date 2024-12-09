@@ -23,18 +23,20 @@ namespace Galactica
 	public:
 		Movement(float currentTime) :
 			m_T1(0.2f), m_T2(0.8f),
-			m_TravelDuration(15.0f),
+			m_TravelDuration(10.0f),
 			m_TravelBeginTime(currentTime)
 		{
 			m_V0 = 2.0f / (1.0f - m_T1 + m_T2);
 
-			GenerateDefultPath();
+			GenerateNewPath(glm::vec3( 0.0, 1.0, 5.0 ),glm::vec3(0));
+			path_completed = false;
+			loop = false;
 			//ComputeTable();
 		}
 
-		glm::vec3 InterpolationFunc(float u,
-			glm::vec3 P0, glm::vec3 P1,
-			glm::vec3 P2, glm::vec3 P3);
+		static glm::vec3 InterpolationFunc(float u,
+		                                   glm::vec3 P0, glm::vec3 P1,
+		                                   glm::vec3 P2, glm::vec3 P3);
 
 		glm::mat4 Update(Galactica::StepTimer timer);
 
@@ -43,6 +45,8 @@ namespace Galactica
 		std::vector<glm::vec3> m_StartingPoints;
 
 		std::vector<glm::vec3> m_ControlPoints;
+
+		std::vector<glm::vec3> m_newPoints;
 
 		float getSpeedFactor() const { return  m_SpeedFactor; }
 
@@ -64,7 +68,13 @@ namespace Galactica
 
 		bool reset;
 
+		glm::mat4 translateMat;
+
+		glm::vec3 GetPos() const { return glm::vec<3, float>(translateMat[3]); }
+
 		void Restart(Galactica::StepTimer timer);
+
+		float DistanceXZ(const glm::vec3& vec1, const glm::vec3& vec2);
 
 	private:
 		float GetDistanceFromTime(float time);
@@ -89,7 +99,7 @@ namespace Galactica
 
 		float m_TravelBeginTime;
 
-		glm::mat4 translateMat;
+		
 		glm::mat4 rotation;
 
 	};

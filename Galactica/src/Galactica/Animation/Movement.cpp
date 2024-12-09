@@ -1,6 +1,7 @@
 #include "glpch.h"
 #include "Movement.h"
 
+#include <iomanip>
 #include <map>
 #include <list>
 
@@ -15,38 +16,51 @@ namespace Galactica
 {
 	glm::vec3 Movement::InterpolationFunc(float u, glm::vec3 P0, glm::vec3 P1, glm::vec3 P2, glm::vec3 P3)
 	{
-		return (-powf(u, 3) + (3 * powf(u, 2) - (3 * u) + 1)) * P0 +
-			((3 * powf(u, 3)) - (6 * powf(u, 2)) + (3 * u)) * P1 +
-			((-3 * powf(u, 3)) + (3 * powf(u, 2))) * P2 +
-			(powf(u, 3)) * P3;
+		float u2 = u * u;
+		float u3 = u2 * u;
 
-		
+		float b0 = -u3 + 3 * u2 - 3 * u + 1;
+		float b1 = 3 * u3 - 6 * u2 + 3 * u;
+		float b2 = -3 * u3 + 3 * u2;
+		float b3 = u3;
+
+		return b0 * P0 + b1 * P1 + b2 * P2 + b3 * P3;
+	}
+
+	float Movement::DistanceXZ(const glm::vec3& vec1, const glm::vec3& vec2)
+	{
+		float dx = vec2.x - vec1.x;
+		float dz = vec2.z - vec1.z;
+		return std::sqrt(dx * dx + dz * dz);
 	}
 
 	void Movement::GenerateNewPath(glm::vec3 target, glm::vec3 position)
 	{
-		m_ControlPoints.clear();
-		m_PlotPoints.clear();
-		m_FinalTable.clear();
+		m_newPoints.clear();
 
-		m_TravelDuration = 5.0f;
-		 
 		target.y = 0.0f;
 		glm::vec3 dir = target - position;
-		dir = glm::normalize(dir);
+		dir = normalize(dir);
 
-		float totalDistance = glm::distance(target, position);
+		float totalDistance = DistanceXZ(position, target);
+		// Print distance
+		std::cout << "Total Distance: " << totalDistance << '\n';
 		float segmentsDistance = totalDistance / 8.0f;
 
-		std::vector<glm::vec3> newPath;
-		newPath.push_back(glm::vec3{ position + (dir * (-segmentsDistance)) });
+		m_newPoints.emplace_back(glm::vec3{ position + (dir * (-segmentsDistance)) });
 
 		for (unsigned int i = 0; i <= 8; ++i)
 		{
-			newPath.push_back(glm::vec3{ position + (dir * (i* segmentsDistance)) });
+			m_newPoints.emplace_back(glm::vec3{ position + (dir * (i * segmentsDistance)) });
 		}
 
-		ComputeTable(newPath);
+		std::cout << "New Points:" << std::endl;
+		for (const auto& point : m_newPoints)
+		{
+			std::cout << "Point: (" << point.x << ", " << point.y << ", " << point.z << ")" << std::endl;
+		}
+
+		ComputeTable(m_newPoints);
 	}
 
 	glm::mat4 Movement::Update(Galactica::StepTimer timer)
@@ -58,17 +72,22 @@ namespace Galactica
 			reset = false;
 		}
 
-		//for sliding/skidding
 		float velocity = GetVelocity(m_NormalizedTime);
-
 		m_SpeedFactor = velocity / m_V0;
 
 		//t in [0, 1]
-		m_NormalizedTime = (static_cast<float>(timer.GetTotalSeconds()) - m_TravelBeginTime) / m_TravelDuration;
+		m_NormalizedTime = (timer.GetTotalSeconds() - m_TravelBeginTime) / m_TravelDuration;
+
+		//std::cout << "Normalized Time after: " << m_NormalizedTime << '\n';
+
 
 		if (m_NormalizedTime < 1.0f)
 		{
 			path_completed = false;
+
+			//for sliding/skidding
+			
+
 			//get distance based on t
 			float dist = GetDistanceFromTime(m_NormalizedTime);
 
@@ -80,20 +99,27 @@ namespace Galactica
 			// convert u from [0,1] to [0, n] where n = number of segments
 			u *= m_LastTableEntry.u;
 
-			auto entriesPerSegment = m_FinalTable.size() / (m_StartingPoints.size() - 3);
+			auto entriesPerSegment = m_FinalTable.size() / (m_newPoints.size() - 3);
 
 			// convert u to [0, 1] for this particular segment
 			u -= (entryIndex / entriesPerSegment);
 
-
 			// find the index for control points in this segment
-			int index = (entryIndex / static_cast<int>(entriesPerSegment)) * 3 + 1;
+			int index = (entryIndex / entriesPerSegment) * 3 + 1;
 			auto P0 = m_ControlPoints[index];
 			auto P1 = m_ControlPoints[index + 1];
 			auto P2 = m_ControlPoints[index + 2];
 			auto P3 = m_ControlPoints[index + 3];
 
 			auto position = InterpolationFunc(u, P0, P1, P2, P3);
+
+			// Print control points and position
+			/*std::cout << "P0: (" << P0.x << ", " << P0.y << ", " << P0.z << ")\n";
+			std::cout << "P1: (" << P1.x << ", " << P1.y << ", " << P1.z << ")\n";
+			std::cout << "P2: (" << P2.x << ", " << P2.y << ", " << P2.z << ")\n";
+			std::cout << "P3: (" << P3.x << ", " << P3.y << ", " << P3.z << ")\n";
+			std::cout << "Position: (" << position.x << ", " << position.y << ", " << position.z << ")\n";*/
+
 
 			//Calculate orientation 
 			auto deltaU = m_FinalTable[1].u - m_FinalTable[0].u;
@@ -104,7 +130,7 @@ namespace Galactica
 			auto U = cross(temp, NW);
 			auto V = cross(NW, U);
 
-		float pi = 2 * acos(0);
+		    float pi = 2 * acos(0);
 
 			rotation = glm::mat4(
 				U.x, U.y, U.z, 0,
@@ -112,7 +138,18 @@ namespace Galactica
 				NW.x, NW.y, NW.z, 0,
 				0, 0, 0, 1) * glm::mat4(pi);
 
-			//loop
+			// Print rotation matrix
+			/*std::cout << "\n\nRotation Matrix:" << '\n';
+			for (int i = 0; i < 4; ++i)
+			{
+				for (int j = 0; j < 4; ++j)
+				{
+					std::cout << std::setw(10) << std::fixed << std::setprecision(4) << rotation[i][j] << " ";
+				}
+				std::cout << '\n';
+			}*/
+
+			// Loop
 			if (m_NormalizedTime > 1.0f && loop)
 			{
 				Restart(timer);
@@ -120,6 +157,17 @@ namespace Galactica
 
 			translateMat = translate(glm::mat4(1.0f), glm::vec3(position.x, position.y, position.z));
 
+			//// Print translateMat matrix
+			//std::cout << "\n\nTranslate Matrix:" << '\n';
+			//for (int i = 0; i < 4; ++i)
+			//{
+			//	for (int j = 0; j < 4; ++j)
+			//	{
+			//		std::cout << std::setw(10) << std::fixed << std::setprecision(4) << translateMat[i][j] << " ";
+			//	}
+			//	std::cout << '\n';
+			//}
+			//int i = 0;
 		}
 		else
 		{
@@ -224,14 +272,19 @@ namespace Galactica
 	
 	void Movement::ComputeTable(std::vector<glm::vec3> path)
 	{
+		m_ControlPoints.clear();
+		m_PlotPoints.clear();
+		m_FinalTable.clear();
+		m_LastTableEntry = TableEntry{ 0.0f, 0.0f };
+
 		//Calculate control points using starting points
 		for (auto i = 1; i < path.size() - 1; ++i)
 		{
 			auto a = path[i] +
-				(path[i + 1] - path[i - 1]) / 8.0f;
+				(path[i + 1] - path[i - 1]) / 9.0f;
 
 			auto b = path[i] -
-				(path[i + 1] - path[i - 1]) / 8.0f;
+				(path[i + 1] - path[i - 1]) / 9.0f;
 
 			m_ControlPoints.emplace_back(b);
 			m_ControlPoints.emplace_back(path[i]);

@@ -143,10 +143,15 @@ namespace Galactica
 		constraints.resize(manipulators.size(), glm::vec2{0.0f});
 		angleRotated.resize(manipulators.size(), 0);
 
+		//Lefft hand index
 		constraints[0] = glm::vec2{-10.0f ,10.0f};
+		//left hand
 		constraints[1] = glm::vec2{-30.0f, 30.0f};
+		// Left foreArm
 		constraints[2] = glm::vec2{0.0f, 110.0f};
+		//left Arm
 		constraints[3] = glm::vec2{-90.0f, 60.0f};
+		// Left Shoulder
 		constraints[4] = glm::vec2{-1.0, 1.0};
 	}
 
@@ -271,6 +276,7 @@ namespace Galactica
 			bonePositions.clear();
 			CalcBoneTransformation(currentAnimation->GetRootNode(), glm::mat4(1.0f), false);
 			//CalcBoneTransformationIK(currentAnimation->GetRootNode(), VQS(), false);
+			//CalcBoneTransformationVQS(currentAnimation->GetRootNode(), VQS());
 		}
 	}
 }

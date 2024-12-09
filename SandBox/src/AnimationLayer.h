@@ -26,12 +26,13 @@ public:
 	bool showSkin = false;
 	bool debugMode = false;
 	bool animate = false;
-	bool showPath = false;
+	bool showPath = true;
 	bool runPath = false;
-	bool movementOnPath = false;
+	bool movementOnPath = true;
 	bool IK = false;
-	glm::vec3 targetPos = { 4.0, 1.0, -4.0 };
+	glm::vec3 targetPos = { 1.0, 1.0, -4.0 };
 	glm::mat4 movement{0};
+	float distance = 0.0f;
 
 
 	bool flag = false;
@@ -48,7 +49,7 @@ private:
 
 	Galactica::Model ourModel;
 
-	Galactica::Model backpackModel;
+	Galactica::Model ball;
 
 	Galactica::Shader AnimationShader;
 

@@ -64,9 +64,8 @@
 	GL_LOGGER_INFO("Loading model Solider");
 
 	ourModel.LoadModel("assets/Soldier/Soldier.dae", false);
-	backpackModel.LoadModel("assets/backpack/backpack.obj",false);
+	ball.LoadModel("assets/Ball.obj",false);
 	GL_LOGGER_INFO("Setting UP IK");
-	
 
 	GL_LOGGER_INFO("Loading model done");
 
@@ -79,7 +78,7 @@
 	GL_LOGGER_INFO("Loading Strafe");
 	running.LoadAnimation("assets/Animations/Running.dae", &ourModel);
 
-	animator.Play(&idle);
+	animator.Play(&Walking);
 
 	animator.SetupIK("mixamorig_LeftHandIndex1");
 	GL_LOGGER_INFO("done");
@@ -106,8 +105,9 @@
 			}
 			animator.UpdateAnimation(ts, path.m_NormalizedTime, path.m_SpeedFactor);
 		}
-		else if(IK)
+		if(IK)
 		{
+			distance = path.DistanceXZ(path.GetPos(), targetPos);
 			if (path.path_completed)
 			{
 				animator.SolveCCDIK(targetPos, ts);
@@ -179,11 +179,9 @@
 				debugBone = movement;
 			}
 
-			
 			LineShader.setMat4("model", debugBone);
 
 			bones.DrawLine(LineShader,2);
-
 		}
 
 		//-----------------Floor draw-----------------//
@@ -209,7 +207,7 @@
 		bag = glm::scale(bag, glm::vec3(0.2f, 0.2f,0.2f));
 		ModelShader.setFloat("objectcolor", 1.0f);
 		ModelShader.setMat4("model", bag);
-		backpackModel.DrawModel(ModelShader);
+		ball.DrawModel(ModelShader);
 
 		//Draw debug
 
@@ -276,26 +274,32 @@
 		//ImGui::Checkbox("Skin", &showSkin);
 		
 	
-		if (ImGui::Button("Run on  Set path"))
-		{
-			animator.Play(&running);
-			/*path.GenerateDefultPath();*/
-			movementOnPath = true;
-			path.path_completed = false;
-			IK = false;
-			path.reset = true;
-		}
+		//if (ImGui::Button("Run on  Set path"))
+		//{
+		//	animator.Play(&running);
+		//	/*path.GenerateDefultPath();*/
+		//	movementOnPath = true;
+		//	path.path_completed = false;
+		//	IK = false;
+		//	path.reset = true;
+		//}
+
 		ImGui::Checkbox("Path", &showPath);
 		ImGui::Text("Velocity : %f", path.m_SpeedFactor);
-		ImGui::Text("Target : X( %f ) Y( %f ) Z( %f ) ", targetPos.x, targetPos.y, targetPos.z);
-		ImGui::Text("Player : X( %f ) Y( %f ) Z( %f ) ", movement[3][0], movement[3][1], movement[3][2]);
+		ImGui::Text("Distance to Target : %f", distance);
+		ImGui::Text("Target : X( %f ) Y( %f ) Z( %f ) ", targetPos.x , targetPos.y, targetPos.z );
+		ImGui::Text("Movement Mat : X( %f ) Y( %f ) Z( %f ) ", movement[3][0], movement[3][1], movement[3][2]);
+		ImGui::Text("Player : X( %f ) Y( %f ) Z( %f ) ", path.translateMat[3][0], path.translateMat[3][1], path.translateMat[3][2]);
 
 
 		if (ImGui::Button("Set Target path for IK"))
         {
 			IK = true;
 			animator.Play(&Walking);
-			path.GenerateNewPath(targetPos, glm::vec3(movement[3][0], movement[3][1], movement[3][2]));
+			// how do i get the posistion of the model
+			glm::vec3 charPos = path.GetPos();
+			path.GenerateNewPath(targetPos, charPos);
+			
 			animator.ResetIK();
 
 			movementOnPath = false;
