@@ -26,7 +26,7 @@ namespace Galactica
 
 		void ResetIK();
 
-		void SolveCCDIK(glm::vec3 const& target, float deltatime);
+		void SolveCCDIK(glm::vec4 const& target, float deltatime);
 
 		void SolveFABRIK(glm::vec3 const& target, float deltatime);
 
@@ -55,7 +55,6 @@ namespace Galactica
 		std::vector<glm::vec2> constraints;
 
 		std::vector<float> angleRotated;
-
 
 	};
 }

@@ -163,43 +163,48 @@ namespace Galactica
 		}
 	}
 
-	void Animator::SolveCCDIK(glm::vec3 const& target, float deltatime)
+	void Animator::SolveCCDIK(glm::vec4 const& target, float deltatime)
 	{
 
 		std::unordered_map<std::string, BoneInfo> const& bone_info_map = currentAnimation->GetBoneIDMap();
 
-		for (unsigned int i = 0; i < manipulators.size() - 1; ++i) {
+		for (unsigned int i = 0; i < manipulators.size() - 1; ++i) 
+		{
 			// getting transformation matrix in end effector's local space
-			glm::mat4 transform_in_ee_local_space{ 1.0f };
-			for (int j = i; j >= 0; --j) {
+			glm::mat4 local_space{ 1.0f };
+			for (int j = i; j >= 0; --j) 
+			{
 				Bone* bone = currentAnimation->FindBone(manipulators[j]->name);
-				transform_in_ee_local_space *= bone->getLocalTransform();
+				local_space *= bone->getLocalTransform();
 			}
 
 			// vector from current joint to current position of end effector
 			glm::vec3 v_ck{
-				transform_in_ee_local_space[3][0],
-				transform_in_ee_local_space[3][1],
-				transform_in_ee_local_space[3][2],
+				local_space[3][0],
+				local_space[3][1],
+				local_space[3][2],
 			};
 
 			Bone* parent_bone = currentAnimation->FindBone(manipulators[i + 1]->name);
 			int parent_id = bone_info_map.at(manipulators[i + 1]->name).id;
-			glm::mat4 parent_transform = finalBoneMatrices[parent_id] *
-				glm::inverse(bone_info_map.at(parent_bone->GetBoneName()).offset);
-			// vector from current joint to final position of end effector
-			glm::vec3 v_dk = glm::inverse(parent_transform) * glm::vec4{ target, 1.0f };
 
-			v_ck = glm::normalize(v_ck);
-			v_dk = glm::normalize(v_dk);
+			glm::mat4 parent_transform = finalBoneMatrices[parent_id] *
+				inverse(bone_info_map.at(parent_bone->GetBoneName()).offset);
+
+			// vector from current joint to final position of end effector
+			glm::vec3 v_dk = inverse(parent_transform) * target;
+
+			v_ck = normalize(v_ck);
+			v_dk = normalize(v_dk);
 
 			// axis of rotation = cross(v_ck, v_dk)
-			glm::vec3 axis = glm::cross(v_ck, v_dk);
+			glm::vec3 axis = cross(v_ck, v_dk);
+
 			// angle to be rotated = dot(v_ck, v_dk)
-			float angle = acosf(glm::dot(v_ck, v_dk)) * deltatime;
+			float angle = acosf(dot(v_ck, v_dk)) * deltatime;
 
 
-			// clamp angle within constraints
+			// clamp angle within constraints else keep track of how much has been rotated
 			if (angleRotated[i] + glm::degrees(angle) < constraints[i].x ||
 				angleRotated[i] + glm::degrees(angle) > constraints[i].y)
 			{
@@ -207,48 +212,54 @@ namespace Galactica
 			}
 			else 
 			{
-				// keep track of how much this manipulator has been rotated
+				
 				angleRotated[i] += glm::degrees(angle);
 			}
 
 			// exit condition
-			if (glm::length(axis) < 0.01f) {
+			if (length(axis) < 0.01f) 
+			{
 				break;
 			}
-			axis = glm::normalize(axis);
 
-			glm::mat4 rotation_mat = glm::mat4{ glm::angleAxis(angle, axis) };
-			rotation_mat *= transform_in_ee_local_space;
+			axis = normalize(axis);
+
+			glm::mat4 rotation_mat = glm::mat4{ angleAxis(angle, axis) };
+
+			rotation_mat *= local_space;
 
 			// transform rotation matrix back to local space of manipulator
-			for (unsigned int j = 0; j < i; ++j) {
+			for (unsigned int j = 0; j < i; ++j) 
+			{
 				Bone* bone = currentAnimation->FindBone(manipulators[j]->name);
-				rotation_mat *= glm::inverse(bone->getLocalTransform());
+				rotation_mat *= inverse(bone->getLocalTransform());
 			}
 			currentAnimation->FindBone(manipulators[i]->name)->setLocalTransform(rotation_mat);
 
 			// update final bone matrix
-			for (int j = i; j >= 0; --j) {
+			for (int j = i; j >= 0; --j)
+			{
 				int curr_index = bone_info_map.at(manipulators[j]->name).id;
 				int parent_index = bone_info_map.at(manipulators[j + 1]->name).id;
 
 				Bone* curr_bone = currentAnimation->FindBone(manipulators[j]->name);
 				Bone* parent_bone = currentAnimation->FindBone(manipulators[j + 1]->name);
+
 				glm::mat4 global_transform = finalBoneMatrices[parent_index]
-					* glm::inverse(bone_info_map.at(parent_bone->GetBoneName()).offset);
+					* inverse(bone_info_map.at(parent_bone->GetBoneName()).offset);
+
 				global_transform *= curr_bone->getLocalTransform();
+
 				finalBoneMatrices[curr_index] = global_transform * bone_info_map.at(curr_bone->GetBoneName()).offset;
 			}
 		}
 
 		CalcBoneTransformation(currentAnimation->GetRootNode(), glm::mat4{ 1.0f }, true);
-
-		//CalcBoneTransformationIK(currentAnimation->GetRootNode(), VQS(), true);
 	}
 
 	void Animator::SolveFABRIK(glm::vec3 const& target, float deltatime)
 	{
-
+		//TODO: Implement FABRIK
 	}
 
 	std::vector<glm::mat4> Animator::GetFinalBoneMatrices()

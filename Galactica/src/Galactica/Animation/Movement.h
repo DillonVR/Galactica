@@ -23,7 +23,7 @@ namespace Galactica
 	public:
 		Movement(float currentTime) :
 			m_T1(0.2f), m_T2(0.8f),
-			m_TravelDuration(10.0f),
+			m_TravelDuration(7.0f),
 			m_TravelBeginTime(currentTime)
 		{
 			m_V0 = 2.0f / (1.0f - m_T1 + m_T2);

@@ -92,36 +92,7 @@
 		camera.OnUpdate(ts);
 		
 
-		//get the translation and rotation
-		if(movementOnPath)
-		{
-			if(path.path_completed)
-			{
-				animator.Play(&idle);
-			}
-			else
-			{
-				movement = path.Update(timer);
-			}
-			animator.UpdateAnimation(ts, path.m_NormalizedTime, path.m_SpeedFactor);
-		}
-		if(IK)
-		{
-			distance = path.DistanceXZ(path.GetPos(), targetPos);
-			if (path.path_completed)
-			{
-				animator.SolveCCDIK(targetPos, ts);
-			}
-			else
-			{
-				movement = path.Update(timer);
-				animator.UpdateAnimation(ts, path.m_NormalizedTime, path.m_SpeedFactor);
-			}
-		}
-		else
-		{
-			animator.UpdateAnimation(ts, path.m_NormalizedTime, 1);
-		}
+		
 
 		const glm::mat4 projection = camera.GetViewProjection();
 
@@ -145,6 +116,46 @@
 		const auto transforms = animator.GetFinalBoneMatrices();
 		for (int i = 0; i < transforms.size(); ++i)
 			AnimationShader.setMat4("finalBonesMatrices[" + std::to_string(i) + "]", transforms[i]);
+
+		//get the translation and rotation
+		if (movementOnPath)
+		{
+			if (path.path_completed)
+			{
+				animator.Play(&idle);
+			}
+			else
+			{
+				movement = path.Update(timer);
+			}
+			animator.UpdateAnimation(ts, path.m_NormalizedTime, path.m_SpeedFactor);
+		}
+		if (IK)
+		{
+			distance = path.DistanceXZ(path.GetPos(), targetPos);
+			if (path.path_completed)
+			{
+				if (distance < 0.8f)
+				{
+					animator.SolveCCDIK(inverse(model) * glm::vec4{ targetPos, 1.0f }, ts);
+				}
+				else
+				{
+					animator.Play(&idle);
+					animator.UpdateAnimation(ts, path.m_NormalizedTime, path.m_SpeedFactor);
+				}
+				
+			}
+			else
+			{
+				movement = path.Update(timer);
+				animator.UpdateAnimation(ts, path.m_NormalizedTime, path.m_SpeedFactor);
+			}
+		}
+		else
+		{
+			animator.UpdateAnimation(ts, path.m_NormalizedTime, 1);
+		}
 
 		//skin model
 		if (showSkin)
@@ -288,7 +299,6 @@
 		ImGui::Text("Velocity : %f", path.m_SpeedFactor);
 		ImGui::Text("Distance to Target : %f", distance);
 		ImGui::Text("Target : X( %f ) Y( %f ) Z( %f ) ", targetPos.x , targetPos.y, targetPos.z );
-		ImGui::Text("Movement Mat : X( %f ) Y( %f ) Z( %f ) ", movement[3][0], movement[3][1], movement[3][2]);
 		ImGui::Text("Player : X( %f ) Y( %f ) Z( %f ) ", path.translateMat[3][0], path.translateMat[3][1], path.translateMat[3][2]);
 
 
@@ -296,7 +306,6 @@
         {
 			IK = true;
 			animator.Play(&Walking);
-			// how do i get the posistion of the model
 			glm::vec3 charPos = path.GetPos();
 			path.GenerateNewPath(targetPos, charPos);
 			
@@ -310,8 +319,9 @@
 
 		ImGui::Checkbox("Debug", &debugMode);
 
-		ImGui::SliderFloat("X", &targetPos.x, -5.0f, 5.0f);
-		ImGui::SliderFloat("Z", &targetPos.z, -5.0f, 5.0f);
+		ImGui::SliderFloat("X", &targetPos.x, 0.0f, 5.0f);
+		ImGui::SliderFloat("Z", &targetPos.z, 0.0f, 5.0f);
+		ImGui::SliderFloat("Y", &targetPos.y, 0.5f, 1.5f);
 		
 		ImGui::End();
 	}

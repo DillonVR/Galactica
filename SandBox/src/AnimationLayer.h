@@ -30,7 +30,7 @@ public:
 	bool runPath = false;
 	bool movementOnPath = true;
 	bool IK = false;
-	glm::vec3 targetPos = { 1.0, 1.0, -4.0 };
+	glm::vec3 targetPos = { 5.0, 1.5, 5.0 };
 	glm::mat4 movement{0};
 	float distance = 0.0f;
 

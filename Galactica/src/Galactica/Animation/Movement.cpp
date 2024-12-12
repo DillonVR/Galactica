@@ -5,10 +5,7 @@
 #include <map>
 #include <list>
 
-#include "imgui.h"
 #include "StepTimer.h"
-#include "Galactica/Math/Vec4.h"
-#include "Galactica/Vendor/glm/glm/ext/scalar_constants.hpp"
 #include "Galactica/Vendor/glm/glm/gtx/compatibility.hpp"
 #include "Galactica/Vendor/glm/glm/gtx/exterior_product.hpp"
 
@@ -34,6 +31,7 @@ namespace Galactica
 		return std::sqrt(dx * dx + dz * dz);
 	}
 
+	//Generate new Path based on where the Target is
 	void Movement::GenerateNewPath(glm::vec3 target, glm::vec3 position)
 	{
 		m_newPoints.clear();
@@ -43,8 +41,7 @@ namespace Galactica
 		dir = normalize(dir);
 
 		float totalDistance = DistanceXZ(position, target);
-		// Print distance
-		std::cout << "Total Distance: " << totalDistance << '\n';
+
 		float segmentsDistance = totalDistance / 8.0f;
 
 		m_newPoints.emplace_back(glm::vec3{ position + (dir * (-segmentsDistance)) });
@@ -52,12 +49,6 @@ namespace Galactica
 		for (unsigned int i = 0; i <= 8; ++i)
 		{
 			m_newPoints.emplace_back(glm::vec3{ position + (dir * (i * segmentsDistance)) });
-		}
-
-		std::cout << "New Points:" << std::endl;
-		for (const auto& point : m_newPoints)
-		{
-			std::cout << "Point: (" << point.x << ", " << point.y << ", " << point.z << ")" << std::endl;
 		}
 
 		ComputeTable(m_newPoints);
