@@ -68,6 +68,13 @@ namespace Galactica
 	}
 
 	template <typename T>
+	Vec3<T> Vec3<T>::operator-(const Vec3& vector) const
+	{
+		GL_CORE_ASSERT(!vector.HasNaNs(), "Operation '/' failed, the vector has NaNs!");
+		return Vec3(x - vector.x, y - vector.y, z - vector.z);
+	}
+
+	template <typename T>
 	Vec3<T>& Vec3<T>::operator-=(const Vec3& vector)
 	{
 		x -= vector.x;

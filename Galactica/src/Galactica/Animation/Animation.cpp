@@ -50,18 +50,18 @@ namespace Galactica
 	
 	void Animation::ReadMissingBones(const aiAnimation* animation, Model& model)
 	{
-		int size = animation->mNumChannels;
+		//int size = animation->mNumChannels;
 
-		const auto& boneInfo = model.GetBoneMap();
-		int& boneCount = model.GetBoneCount(); 
+		//const auto& boneInfo = model.GetBoneMap();
+		//int& boneCount = model.GetBoneCount(); 
 
-		//reading channels(bones engaged in an animation and their keyframes)
-		for (int i = 0; i < size; i++)
-		{
-			auto channel = animation->mChannels[i];
-			std::string boneName = channel->mNodeName.data;
+		////reading channels(bones engaged in an animation and their keyframes)
+		//for (int i = 0; i < size; i++)
+		//{
+		//	auto channel = animation->mChannels[i];
+		//	std::string boneName = channel->mNodeName.data;
 
-			if (boneInfoMap.find(boneName) == boneInfoMap.end())
+			/*if (boneInfoMap.find(boneName) == boneInfoMap.end())
 			{
 				boneInfoMap[boneName].id = boneCount;
 				boneCount++;
@@ -70,7 +70,7 @@ namespace Galactica
 				boneInfoMap[channel->mNodeName.data].id, channel));
 		}
 
-		boneInfoMap = boneInfo;
+		boneInfoMap = boneInfo;*/
 	}
 
 	// Read in Heirarchy

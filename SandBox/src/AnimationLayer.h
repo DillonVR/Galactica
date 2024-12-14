@@ -1,15 +1,11 @@
 #pragma once
 
-#include "imgui.h"
-#include "Galactica/Animation/Animation.h"
-#include "Galactica/Animation/Animator.h"
-#include "Galactica/Renderer/CameraControl.h"
 #include "Galactica/Renderer/Model.h"
-
 #include "Galactica/Layer.h"
-#include "Galactica/Animation/Movement.h"
 #include "Galactica/Math/Spline.h"
-#include "Galactica/Renderer/Line.h"
+#include <Galactica/Physics/Physics.h>
+
+#include "Galactica/Renderer/Renderer.h"
 
 class AnimationLayer : public Galactica::Layer
 {
@@ -20,7 +16,6 @@ public:
 	std::vector<Galactica::Vertex> vertices;
 	std::vector<unsigned int> indices;
 	std::vector<Galactica::Texture> textures;
-	std::vector<Galactica::BoneLine> skelly;
 
 	bool showBones = false;
 	bool showSkin = true;
@@ -42,32 +37,12 @@ public:
 
 private:
 
-	Galactica::Model ourModel;
+	Galactica::Model* plane;
 
-	Galactica::Model backpackModel;
+	Galactica::Renderer::Renderer* renderer;
 
-	Galactica::Shader AnimationShader;
-
-	Galactica::Shader ModelShader;
-
-	Galactica::Shader LineShader;
+	Galactica::SoftBody* softBody;
 
 	Galactica::CameraControl camera;
-
-	Galactica::Animation idle;
-
-	Galactica::Animation Walking;
-
-	Galactica::Animation running;
-
-	Galactica::Animator animator;
-
-	Galactica::Mesh floormesh;
-
-	Galactica::Line bones;
-
-	Galactica::Movement path;
-
-	Galactica::Line drawPath;
 };
 

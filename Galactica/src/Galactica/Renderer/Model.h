@@ -1,79 +1,43 @@
 #pragma once
 
-#include <map>
 #include <assimp/Importer.hpp>
 
 #include "Mesh.h"
 #include "Shader.h"
 
-#include <assimp/material.h>
 #include <assimp/scene.h>
 #include <assimp/mesh.h>
 
+#include "GameObject.h"
+
 namespace Galactica
 {
-	unsigned int TextureFromFile(const char* path, const std::string& directory, bool gamma = false);
-
-	#define MAX_BONE 100
-
-	struct BoneInfo
+    class GALACTICA_API Model : public GameObject
 	{
-		int id;
-		glm::mat4 offset;
-	};
+	    public:
+	        Model(std::string path)
+    	{
+	            loadModel(path);
+	        }
 
-	struct BoneLine
-	{
-		glm::vec3 start;
-		glm::vec3 end;
-	};
-	
-	class GALACTICA_API Model
-	{
-	public:
+	        ~Model() {}
 
-		std::vector<Texture> textureLoaded;
-		std::vector<Mesh> meshes;
-		std::string directory;
-		std::unordered_map<std::string, BoneInfo> boneMap;
-		std::vector<BoneLine> boneLines;
+	        glm::vec3 color;
 
-		int boneNum = 0;
+	        void draw(Shader& shader);
 
-		bool gammaCorrection;
+	        // model data
+	        std::vector<Mesh> meshes;
 
-		Model() = default;
+	        std::string directory;
 
-		void DrawModel(Shader &shader);
+	    private:
+	        void loadModel(std::string path);
 
-		void LoadModel(std::string const& path, bool gamma);
+	        void processNode(aiNode* node, const aiScene* scene);
 
-		std::unordered_map<std::string, BoneInfo> GetBoneMap() { return boneMap; }
-
-		int& GetBoneCount() { return boneNum; }
-
-		void Bonelines(aiNode* node, BoneLine bone_lines);
-
-
-		std::vector<BoneLine> GetBoneLines();
-
-	private:
-
-		void SetVertexBoneData(Vertex& vertex, int boneID, float weight);
-
-		void ExtractBoneWeightForVertices(std::vector<Vertex>& vertices, aiMesh* mesh, const aiScene* scene);
-
-		void SetVertextBoneDataDefault(Vertex& vertex);
-
-		void processNode(aiNode* node, const aiScene* scene);
-
-		Mesh processMesh(aiMesh* mesh, const aiScene* scene);
-
-		std::vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName);
-
-	};
-
-	unsigned int TextureFromFile(const char* path, const std::string& directory, bool gamma);
+	        Mesh processMesh(aiMesh* mesh, const aiScene* scene);
+    };
 }
 
 

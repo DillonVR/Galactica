@@ -6,7 +6,7 @@ namespace Galactica
 {
 	template <typename T>
 	constexpr Mat3<T>::Mat3() noexcept
-		: data(0)
+		: data{ 0 }
 	{
 	}
 

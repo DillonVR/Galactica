@@ -43,6 +43,7 @@ namespace Galactica
 		Vec3 operator+(const Vec3& vector);
 		Vec3& operator+=(const Vec3& vector);
 		Vec3 operator-(const Vec3& vector);
+		Vec3 operator-(const Vec3& vector) const;
 		Vec3& operator-=(const Vec3& vector);
 		Vec3 operator*(T value);
 		Vec3& operator*=(T value);

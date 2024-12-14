@@ -2,23 +2,22 @@
 #include "Application.h"
 
 #include <fstream>
-
-#include <GLFW/glfw3.h>
-
 #include "Animation\StepTimer.h"
 #include "Galactica/Vendor/glm/glm/glm.hpp"
-
 #include "Galactica/Vendor/stb_image/stb_image.h"
 #include "Renderer/CameraControl.h"
 #include "Renderer/Model.h"
-
+#include "Renderer/Renderer.h"
 #include "Renderer/Shader.h"
+
+#include <GLFW/glfw3.h>
 
 namespace Galactica {
 
 #define BIND_EVENT_FN(x) std::bind(&Application::x,this,std::placeholders::_1)
 
 	//Application* Application::s_Instance = nullptr;
+
 
 	Application::Application()
 	{
@@ -51,7 +50,6 @@ namespace Galactica {
 			m_LastFrameTime = time;
 
 			Tick();
-
 		}
 	}
 

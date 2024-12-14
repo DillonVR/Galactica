@@ -49,6 +49,9 @@
     <Filter Include="src\Galactica\Math">
       <UniqueIdentifier>{0EAFEA04-FA92-AB5A-63F3-A5AD4FF695DC}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Galactica\Physics">
+      <UniqueIdentifier>{871D4D2C-F389-0827-BC7D-A08428A92A8F}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\Galactica\Renderer">
       <UniqueIdentifier>{5BA0CB8C-479A-F4DE-3007-8BEF1CA05A4B}</UniqueIdentifier>
     </Filter>
@@ -1455,9 +1458,10 @@
     <ClInclude Include="src\glpch.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="Texture.h">
-      <Filter>src\Galactica\Renderer</Filter>
-    </ClInclude>
+    <ClInclude Include="src\Galactica\Core\Globals.h" />
+    <ClInclude Include="src\Galactica\Renderer\Geomerty3D.h" />
+    <ClInclude Include="src\Galactica\Renderer\GameObject.h" />
+    <ClInclude Include="src\Galactica\Physics\Physics.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Vendor\stb_image\stb_image.cpp">
@@ -1523,5 +1527,8 @@
     <ClCompile Include="src\glpch.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\Galactica\Renderer\Geomerty3D.cpp" />
+    <ClCompile Include="src\Galactica\Renderer\GameObject.cpp" />
+    <ClCompile Include="src\Galactica\Physics\Physics.cpp" />
   </ItemGroup>
 </Project>

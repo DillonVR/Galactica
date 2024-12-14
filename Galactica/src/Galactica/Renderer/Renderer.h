@@ -1,19 +1,23 @@
 #pragma once
 
-namespace Galactica
+#include "CameraControl.h"
+#include "Model.h"
+#include "Shader.h"
+
+
+namespace Galactica::Renderer
 {
 	class GALACTICA_API Renderer
 	{
+		public:
+
 		
-	public:
 
-		Renderer();
-		~Renderer();
-
-		void Init();
-		void OnUpdate();
-
+	
+		void Setup(const char* vertexPath, const char* fragmentPath);
+		void Draw(Model* light, std::vector<Model*> scene,CameraControl* cam, bool debug);
 	};
+		
+	
 }
-
 

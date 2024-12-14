@@ -147,7 +147,10 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Texture.h" />
+    <ClInclude Include="src\Galactica\Physics\Physics.h" />
+    <ClInclude Include="src\Galactica\Renderer\GameObject.h" />
+    <ClInclude Include="src\Galactica\Renderer\Geomerty3D.h" />
+    <ClInclude Include="src\Galactica\Core\Globals.h" />
     <ClInclude Include="Vendor\glm\glm\common.hpp" />
     <ClInclude Include="Vendor\glm\glm\detail\_features.hpp" />
     <ClInclude Include="Vendor\glm\glm\detail\_fixes.hpp" />
@@ -616,6 +619,9 @@
     <ClInclude Include="src\glpch.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Galactica\Physics\Physics.cpp" />
+    <ClCompile Include="src\Galactica\Renderer\GameObject.cpp" />
+    <ClCompile Include="src\Galactica\Renderer\Geomerty3D.cpp" />
     <ClCompile Include="Vendor\stb_image\stb_image.cpp" />
     <ClCompile Include="src\Galactica\Animation\Animation.cpp" />
     <ClCompile Include="src\Galactica\Animation\Animator.cpp" />

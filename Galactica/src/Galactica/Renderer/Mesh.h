@@ -10,57 +10,38 @@
 
 namespace Galactica{
 
-	#define MAX_BONE_INFLUENCE 4
-
-	struct Vertex {
-	    glm::vec3 Position;
-	    glm::vec3 Normal;
-	    glm::vec2 TexCoords;
-	    glm::vec3 Tangent;
-	    glm::vec3 Bitangent;
-	    
-	    int m_BoneIDs[MAX_BONE_INFLUENCE];
-	    float m_Weights[MAX_BONE_INFLUENCE];
+	struct Vertex
+	{
+		glm::vec3 position;
+		glm::vec3 normal;
+		glm::vec3 texCoords;
 	};
 
-	struct Texture {
-	    unsigned int id;
-	    std::string type;
-	    std::string path;
+	struct Texture
+	{
+		unsigned int id;
+		std::string type;
 	};
-
-
 
 	class GALACTICA_API Mesh
 	{
-	public:
+		public:
+			std::vector<Vertex> vertices;
 
-        Mesh() = default;
+			std::vector<unsigned int> indices;
 
-		Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, const std::vector<Texture>& textures);
+			std::vector<Texture> textures;
 
-		void lineMesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices);
+			Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);
 
-		void TexturedMesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, const std::vector<Texture>& textures);
+			void draw(Shader& shader);
 
-		//void lineBone(const std::vector<Galactica::BoneLine>& vertices);
+			void UpdateVertices(std::vector<Vertex> vertices);
 
-		void DebugMode(bool set);
+		private:
+			unsigned int VAO, VBO, EBO;
 
-        void DrawMesh(Shader& shader);
-
-		std::vector<Vertex> vertices;
-		//std::vector<BoneLine> bones;
-        std::vector<unsigned int> indices;
-        std::vector<Texture> textures;
-        unsigned int VAO;
-    private:
-
-        unsigned int VBO;
-        unsigned int EBO;
-
-        void InitMesh();
-		void InitTexture2DMesh();
+			void setup();
 	};
 }
 

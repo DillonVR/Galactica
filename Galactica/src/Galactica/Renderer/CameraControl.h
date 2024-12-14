@@ -78,7 +78,7 @@ namespace Galactica
 
 		glm::mat4 cameraViewMatrix;
 
-		glm::vec3 cameraPosition = { 0.0f, 0.0f, 0.0f };
+		glm::vec3 cameraPosition = { 0.0f, 0.0f, -5.0f };
 
 		glm::vec3 cameraFocalPoint = { 0.0f, 0.0f, 0.0f };
 
