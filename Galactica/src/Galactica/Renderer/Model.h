@@ -32,6 +32,7 @@ namespace Galactica
 	        std::string directory;
 
 	    private:
+
 	        void loadModel(std::string path);
 
 	        void processNode(aiNode* node, const aiScene* scene);

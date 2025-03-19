@@ -32,7 +32,8 @@ namespace Galactica::Renderer
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
-    void Renderer::Draw(Model* light, std::vector<Model*> scene, CameraControl* cam, bool debug) {
+    void Renderer::Draw(Model* light, std::vector<Model*> scene, CameraControl* cam, bool debug)
+    {
         // Check we have a light and models
         assert(light != nullptr && "ERROR: No light provided!");
         assert(scene.size() > 0 && "ERROR: Scene is empty!");
@@ -48,7 +49,6 @@ namespace Galactica::Renderer
 			
 
         // Projection matrix
-       
 
         glm::mat4 projection = cam->GetProjection();
 
@@ -75,7 +75,8 @@ namespace Galactica::Renderer
         light->draw(*shader);
 
         // Render all other objects in the scene
-        for (Model* model : scene) {
+        for (Model* model : scene) 
+        {
             glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(model->getTransform()));
             glUniformMatrix4fv(modelViewLoc, 1, GL_FALSE, glm::value_ptr(view));
             glUniformMatrix4fv(modelProjectionLoc, 1, GL_FALSE, glm::value_ptr(projection));

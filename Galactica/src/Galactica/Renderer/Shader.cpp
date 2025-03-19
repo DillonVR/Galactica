@@ -24,9 +24,7 @@ namespace Galactica
 
         try
         {
-            // open files
-            std::cout << "Loading vertex shader from: " << vertexPath << std::endl;
-            std::cout << "Loading fragment shader from: " << fragmentPath << std::endl << std::endl;
+            
             vShaderFile.open(vertexPath);
             fShaderFile.open(fragmentPath);
             std::stringstream vShaderStream, fShaderStream;
@@ -99,8 +97,6 @@ namespace Galactica
         glDeleteShader(vertex);
         glDeleteShader(fragment);
 
-        std::cout << "Loaded and compiled: " << vertexPath << std::endl;
-        std::cout << "Loaded and compiled: " << fragmentPath << std::endl << std::endl;
     }
 
     void Shader::use() {

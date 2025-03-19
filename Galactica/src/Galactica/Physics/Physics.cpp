@@ -5,12 +5,11 @@
 
 namespace Galactica
 {
-	
-
+	//Soft Body
 	SoftBody::SoftBody(std::string path, float restitution, float mass, float stiffness, float damping)
 	: Model(path)
 	{
-		assert(meshes.size() > 0 && "ERROR: More than one mesh provided for softbody in this model, provide a single mesh!");
+		assert(meshes.size() > 0 && "ERROR: More than one mesh provided!");
 		springCount = 0;
 		
 		this->restitution = restitution;
@@ -40,7 +39,8 @@ namespace Galactica
 		}
 	}
 
-	SoftBody::~SoftBody() {
+	SoftBody::~SoftBody()
+	{
 
 	}
 
@@ -111,11 +111,10 @@ namespace Galactica
 		}
 	}
 
-	/*
-	 * Point mass
-	 */
+	//Point Mass
 
-	PointMass::PointMass(Vertex* vert, SoftBody* body, float restitution, float mass, float stiffness, float damping) {
+	PointMass::PointMass(Vertex* vert, SoftBody* body, float restitution, float mass, float stiffness, float damping) 
+	{
 		this->vert = vert; // Reference vertex in dynamic vertices
 		this->body = body;
 
@@ -129,37 +128,38 @@ namespace Galactica
 		forces = glm::vec3(0.0);
 	}
 
-	PointMass::~PointMass() {
+	PointMass::~PointMass()
+	{}
 
-	}
-
-	void PointMass::Integrate(float dt) {
-
-		
+	void PointMass::Integrate(float dt)
+	{
 		glm::mat4 transform = body->getTransform();
 		glm::mat4 inverse = glm::inverse(transform);
 
 		glm::vec3 world = transform * glm::vec4(vert->position, 1);
 
-		if (world.y <= 0.1) {
+		if (world.y <= 0.1)
+		{
 			velocity = glm::vec4(velocity.x, -velocity.y * restitution, velocity.z, 1);
 			vert->position.y = (inverse * glm::vec4(0, 0.1, 0, 1)).y;
 		}
-		if (world.x <= -10) {
+		if (world.x <= -10)
+		{
 			velocity = glm::vec4(-velocity.x * restitution, velocity.y, velocity.z, 1);
 			vert->position.x = (inverse * glm::vec4(-10, 0, 0, 1)).x;
 		}
-		if (world.x >= 10) {
+		if (world.x >= 10)
+		{
 			velocity = glm::vec4(velocity.x * restitution, velocity.y, velocity.z , 1);
 			vert->position.x = (inverse * glm::vec4(10, 0, 0, 1)).x;
 		}
-		if (world.z <= -10) {
+		if (world.z <= -10)
+		{
 			velocity = glm::vec4(-velocity.x, velocity.y, -velocity.z * restitution, 1);
 			vert->position.z = (inverse * glm::vec4(0, 0, -10, 1)).z;
 		}
 
-		// Integrate euler
-
+		// Integrate euler method
 		acceleration = forces / mass;
 		velocity += acceleration * dt;
 		vert->position += velocity * dt;

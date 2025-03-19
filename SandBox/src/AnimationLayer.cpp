@@ -6,7 +6,6 @@
 #include "Galactica/Vendor/imgui/imgui.h"
 
 	
-
 static Galactica::Model* light;
 static std::vector<Galactica::Model*> scene;
 
