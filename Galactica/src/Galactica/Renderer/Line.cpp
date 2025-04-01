@@ -18,7 +18,7 @@ namespace Galactica
 
 	void Line::DrawLine(Shader& shader, int type)
 	{
-		glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
+		glBindVertexArray(VAO);
 		switch (type)
 		{
 		case 1:
@@ -27,16 +27,13 @@ namespace Galactica
 		case 2:
 			glDrawArrays(GL_LINES, 0, lineVertices.size());
 			break;
-
 		}
-		
 	}
 
 	void Line::InitLine()
 	{
 		glGenVertexArrays(1, &VAO);
 		glGenBuffers(1, &VBO);
-		// bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
 		glBindVertexArray(VAO);
 
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);

@@ -205,10 +205,7 @@ namespace Galactica
 
 	bool CameraControl::OnWindowResized(WindowResizeEvent& e)
 	{
-
 		SetViewportSize(static_cast<float>(e.GetWidth()), static_cast<float>(e.GetHeight()));
-		//printf("\nWindow Width %d",e.GetWidth());
-		//printf("\nWindow Height %d", e.GetHeight());
 		return false;
 	}
 }

@@ -15,6 +15,6 @@ namespace Galactica
 		glm::mat4 Rz = glm::rotate(I, glm::radians(rot.z), glm::vec3(0.0f, 0.0f, 1.0f));
 		glm::mat4 S = glm::scale(I, scale);
 
-		return T * Rz * Ry * Rx * S; // TODO: Rotation order support
+		return T * Rz * Ry * Rx * S;
 	}
 }

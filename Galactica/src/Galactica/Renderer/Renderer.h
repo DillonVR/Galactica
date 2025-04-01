@@ -11,10 +11,8 @@ namespace Galactica::Renderer
 	{
 		public:
 
-		
-
-	
 		void Setup(const char* vertexPath, const char* fragmentPath);
+
 		void Draw(Model* light, std::vector<Model*> scene,CameraControl* cam, bool debug);
 	};
 		

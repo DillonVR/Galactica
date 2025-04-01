@@ -2,7 +2,6 @@
 
 #include "Physics.h"
 
-
 namespace Galactica
 {
 	//Soft Body
@@ -32,7 +31,8 @@ namespace Galactica
 			for (PointMass& p2 : pointMasses)
 			{
 				float d = glm::distance(p1.vert->position, p2.vert->position);
-				if (d > 0.1) {
+				if (d > 0.1)
+				{
 					AddSpring(&p1, &p2);
 				}
 			}
@@ -57,11 +57,13 @@ namespace Galactica
 		Spring s;
 		s.a = a;
 		s.b = b;
+
 		s.restLength = glm::distance(a->vert->position, b->vert->position);
 		springs.push_back(s);
 		springCount++;
 	}
 
+	// ToDo: Change to use my own math.
 	void SoftBody::Update(float dt)
 	{
 		// Calculate spring forces (Hooke's law)
@@ -112,10 +114,9 @@ namespace Galactica
 	}
 
 	//Point Mass
-
 	PointMass::PointMass(Vertex* vert, SoftBody* body, float restitution, float mass, float stiffness, float damping) 
 	{
-		this->vert = vert; // Reference vertex in dynamic vertices
+		this->vert = vert;
 		this->body = body;
 
 		this->restitution = restitution;
@@ -131,6 +132,7 @@ namespace Galactica
 	PointMass::~PointMass()
 	{}
 
+	//ToDo: Change to use my own math.
 	void PointMass::Integrate(float dt)
 	{
 		glm::mat4 transform = body->getTransform();
@@ -159,7 +161,7 @@ namespace Galactica
 			vert->position.z = (inverse * glm::vec4(0, 0, -10, 1)).z;
 		}
 
-		// Integrate euler method
+		// ToDo: Integrate euler method
 		acceleration = forces / mass;
 		velocity += acceleration * dt;
 		vert->position += velocity * dt;

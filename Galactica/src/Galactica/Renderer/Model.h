@@ -16,7 +16,7 @@ namespace Galactica
 	{
 	    public:
 	        Model(std::string path)
-    	{
+    		{
 	            loadModel(path);
 	        }
 
@@ -26,7 +26,6 @@ namespace Galactica
 
 	        void draw(Shader& shader);
 
-	        // model data
 	        std::vector<Mesh> meshes;
 
 	        std::string directory;

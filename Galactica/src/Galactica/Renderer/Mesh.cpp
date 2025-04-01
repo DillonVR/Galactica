@@ -16,7 +16,8 @@ namespace Galactica
         setup();
     }
 
-    void Mesh::setup() {
+    void Mesh::setup()
+    {
         glGenVertexArrays(1, &VAO);
         glGenBuffers(1, &VBO);
         glGenBuffers(1, &EBO);
@@ -44,13 +45,12 @@ namespace Galactica
 
     void Mesh::UpdateVertices(std::vector<Vertex> vertices)
 	{
-        // Send data to GPU
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
         glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
     }
 
-    void Mesh::draw(Shader& shader) {
-        // draw mesh
+    void Mesh::draw(Shader& shader)
+    {
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);

@@ -16,9 +16,10 @@ namespace Galactica
 {
     void Model::draw(Shader& shader)
 	{
-        // Draw all meshes in the model
         for (auto& meshe : meshes)
-	        meshe.draw(shader);
+        {
+            meshe.draw(shader);
+        }
     }
 
     void Model::loadModel(std::string path)
@@ -38,13 +39,13 @@ namespace Galactica
 
     void Model::processNode(aiNode* node, const aiScene* scene)
     {
-        // process all the node's meshes (if any)
         for (unsigned int i = 0; i < node->mNumMeshes; i++)
         {
             aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
             meshes.push_back(processMesh(mesh, scene));
         }
-        // then do the same for each of its children
+
+        //children
         for (unsigned int i = 0; i < node->mNumChildren; i++)
         {
             processNode(node->mChildren[i], scene);
@@ -68,7 +69,6 @@ namespace Galactica
             vector.z = mesh->mVertices[i].z;
             vertex.position = vector;
 
-            // TODO: Check if the obj has normals at all
             vector.x = mesh->mNormals[i].x;
             vector.y = mesh->mNormals[i].y;
             vector.z = mesh->mNormals[i].z;
@@ -76,12 +76,15 @@ namespace Galactica
 
             vertices.push_back(vertex);
         }
+
         // process indices
         for (unsigned int i = 0; i < mesh->mNumFaces; i++)
         {
             aiFace face = mesh->mFaces[i];
             for (unsigned int j = 0; j < face.mNumIndices; j++)
+            {
                 indices.push_back(face.mIndices[j]);
+            }  
         }
 
         return Mesh(vertices, indices, textures);
