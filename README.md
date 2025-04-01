@@ -1,9 +1,9 @@
 # Galactica
 
-Game Engine for the summer coming soon
+Game Engine in the works
 
 ****************************
-Used premake to in order to genertate the file needed to run the engine. 
+Used premake to generate the file needed to run the engine. 
 
 .\GenerateProject.bat
 
