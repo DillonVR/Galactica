@@ -16,7 +16,7 @@ static std::vector<Galactica::Model*> scene;
 
 		// Create a light
 		light = new Galactica::Model("assets/cube.obj");
-		light->pos = glm::vec3(0, 20, 0);
+		light->pos = glm::vec3(0, 100, 0);
 		light->color = glm::vec3(1.0f, 1.0f, 1.0f);
 		light->scale = glm::vec3(0.25, 0.25, 0.25);
 
@@ -61,7 +61,7 @@ static std::vector<Galactica::Model*> scene;
 		ImGui::Begin("Settings");
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
 		ImGui::Text("SoftBodies");
-		if (ImGui::Button("Donut"))
+		/*if (ImGui::Button("Donut"))
 		{
 			delete softBody;
 
@@ -86,7 +86,7 @@ static std::vector<Galactica::Model*> scene;
 			scene.pop_back();
 			scene.push_back(softBody);
 			
-		}
+		}*/
 		ImGui::Text("Commands");
 		// IamGui button
 		if (ImGui::Button("Jump"))
